@@ -5,7 +5,7 @@
 #### How should this be manually tested?
 
 1. Clone this branch.
-2. Run `cd artemis-ah-frontend`
+2. Navigate to the project file
 3. Run `npm install` to install the dependencies.
 4. Run `npm test` to run the tests.
 
