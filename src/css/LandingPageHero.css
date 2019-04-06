@@ -1,0 +1,101 @@
+.index-backdrop {
+  background-image: url("../images/handshake.jpg");
+  background-position: center;
+  background-size: cover;
+  z-index: 2;
+  opacity: 0.15;
+  position: fixed;
+  top: 90px;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.index-landing {
+  margin: 90px 0 0;
+  padding: 5%;
+  color: #f4faff;
+  text-align: left;
+  height: fit-content;
+  min-height: calc(100vh - 90px);
+  position: relative;
+  z-index: 1;
+}
+
+.index-info {
+  z-index: 3;
+  position: relative;
+}
+
+.index-landing-signup {
+  margin-right: 10px;
+  border: none;
+  background: #f4faff;
+  color: #d81e5b;
+}
+
+.index-landing-login {
+  border: 1px solid #f4faff;
+  background: transparent;
+  color: #f4faff;
+  display: inline-block;
+}
+
+.index-landing-login,
+.index-landing-signup,
+.index-landing-resolved-reports {
+  padding: 20px;
+  font-size: 20px;
+  border-radius: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+  box-shadow: 1px 2px 5px -5px rgba(0, 0, 0, 0.1);
+}
+
+.index-landing-resolved-reports {
+  margin-right: 10px;
+  border: none;
+  background: #f4faff;
+  color: #d81e5b;
+  width: fit-content;
+  margin: auto;
+  margin-top: 20px;
+  display: block;
+}
+
+.index-landing-login:hover,
+.index-landing-signup:hover,
+.index-landing-resolved-reports:hover {
+  box-shadow: 0 0.625rem 2.5rem 0 rgba(198, 203, 222, 0.45);
+}
+
+.index-affirmation {
+  text-align: center;
+}
+
+.index-landing-img-div {
+  position: absolute;
+  top: 15%;
+  right: 5%;
+  display: block;
+  text-align: center;
+}
+
+.index-landing-img-div svg {
+  fill: #f4faff;
+  width: 120px;
+  height: 120px;
+}
+
+.index-landing-img-div p {
+  font-size: 16px !important;
+}
+
+.index-landing h2 {
+  font-size: 50px;
+  width: 210px;
+}
+
+.index-landing p {
+  font-size: 24px;
+}
