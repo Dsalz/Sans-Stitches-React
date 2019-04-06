@@ -13,7 +13,7 @@ const cssPlugin = new MiniCSSExtractPlugin({
 
 module.exports = {
   devtool: "eval",
-  entry: "./src/components/App.jsx",
+  entry: "./src/App.jsx",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js",
@@ -27,6 +27,7 @@ module.exports = {
       ".css",
       ".png",
       ".jpeg",
+      ".jpg",
       ".gif",
       ".svg"
     ]
