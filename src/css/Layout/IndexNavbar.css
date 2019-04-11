@@ -45,3 +45,16 @@
   background: #d81e5b;
   color: #fff !important;
 }
+
+@media screen and (max-width: 800px) {
+  .index-navbar-logo {
+    font-size: 23px;
+  }
+
+  .index-navbar-links {
+    width: 150px;
+  }
+  .index-navbar-links a {
+    font-size: 15px;
+  }
+}

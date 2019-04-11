@@ -1,6 +1,6 @@
 import React from "react";
 import { shallow } from "enzyme";
-import IndexNavbar from "../components/Layout/IndexNavbar.jsx";
+import IndexNavbar from "../../components/Layout/IndexNavbar.jsx";
 
 describe("Index Navbar component", () => {
   const indexNavbar = shallow(<IndexNavbar />);
