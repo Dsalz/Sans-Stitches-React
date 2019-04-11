@@ -1,0 +1,41 @@
+.index-main {
+  display: flex;
+  justify-content: center;
+  padding: 100px 0;
+  margin-top: 50px;
+}
+
+.index-all-resolved {
+  padding: 0;
+}
+
+.index-details {
+  margin: auto !important;
+  margin-top: 120px !important;
+}
+
+.index-form-section {
+  min-width: 280px;
+  width: 40%;
+  margin: 0 auto;
+  background: #fff;
+  padding: 40px 5%;
+  border-radius: 10px;
+}
+
+.index-form-section-header {
+  text-align: center;
+  font-size: 24px;
+  margin: 0;
+}
+
+.top-form-error {
+  margin-top: 15px;
+  margin-bottom: -30px;
+}
+
+@media screen and (max-width: 800px) {
+  .index-form-section-header {
+    font-size: 20px;
+  }
+}

@@ -99,3 +99,9 @@
 .index-landing p {
   font-size: 24px;
 }
+
+@media screen and (max-width: 1000px) {
+  .index-landing-img-div {
+    display: none;
+  }
+}

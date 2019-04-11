@@ -1,6 +1,6 @@
 import React from "react";
 import { shallow } from "enzyme";
-import LandingPageHero from "../components/LandingPageHero";
+import LandingPageHero from "../../components/LandingPageHero";
 
 describe("Landing page hero component", () => {
   const landingPageHero = shallow(<LandingPageHero />);
