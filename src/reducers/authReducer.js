@@ -10,7 +10,9 @@ import {
   LOGIN_USER,
   CLEAR_AUTH_ERRORS,
   AUTH_LOADING,
-  LOGOUT_USER
+  LOGOUT_USER,
+  SIGNUP_USER,
+  SIGNUP_ERROR
 } from "../actionTypes";
 
 /* eslint-disable indent */
@@ -56,6 +58,21 @@ const authReducer = (state = initialState(localStorage), { type, payload }) => {
       return {
         ...state,
         errorMessages: []
+      };
+    case SIGNUP_USER:
+      addDetailsToLocalStorage({ token: payload.token }, localStorage);
+      return {
+        ...state,
+        isLoggedIn: true,
+        token: payload.token,
+        loading: false
+      };
+    case SIGNUP_ERROR:
+      return {
+        ...state,
+        errorMessages:
+          payload instanceof Array ? payload : [{ error: payload }],
+        loading: false
       };
     default:
       return state;

@@ -13,6 +13,7 @@ import "./css/appCSS.js";
 // Views
 import LandingPage from "./views/LandingPage";
 import AppLoginPage from "./views/LoginPage";
+import AppSignUpPage from "./views/SignUpPage";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
       <Switch>
         <Route exact path="/" component={LandingPage} />
         <Route exact path="/login" component={AppLoginPage} />
+        <Route exact path="/signup" component={AppSignUpPage} />
       </Switch>
     </BrowserRouter>
   );
