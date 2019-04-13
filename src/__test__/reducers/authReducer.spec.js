@@ -4,7 +4,9 @@ import {
   LOGIN_USER,
   AUTH_LOADING,
   CLEAR_AUTH_ERRORS,
-  LOGOUT_USER
+  LOGOUT_USER,
+  SIGNUP_USER,
+  SIGNUP_ERROR
 } from "../../actionTypes";
 
 describe("auth reducer's initial state", () => {
@@ -68,7 +70,7 @@ describe("auth reducer", () => {
     expect(reducerState.loading).toEqual(true);
   });
 
-  it("should update error messages when action is dispatched", () => {
+  it("should update error messages when LOGIN_ERROR action is dispatched", () => {
     const reducerState = authReducer(initialState(mockLocalStorage), {
       type: LOGIN_ERROR,
       payload: [{ email: "Invalid Email" }]
@@ -77,12 +79,14 @@ describe("auth reducer", () => {
     expect(reducerState.loading).toEqual(false);
   });
 
-  it("should convert string error message to array when action is dispatched", () => {
+  it("should convert string error message to array when LOGIN_ERROR action is dispatched", () => {
     const reducerState = authReducer(initialState(mockLocalStorage), {
       type: LOGIN_ERROR,
-      payload: "Invalid Email"
+      payload: "Invalid Credentials"
     });
-    expect(reducerState.errorMessages).toEqual([{ error: "Invalid Email" }]);
+    expect(reducerState.errorMessages).toEqual([
+      { error: "Invalid Credentials" }
+    ]);
     expect(reducerState.loading).toEqual(false);
   });
 
@@ -98,5 +102,35 @@ describe("auth reducer", () => {
       type: CLEAR_AUTH_ERRORS
     });
     expect(reducerState.errorMessages).toEqual([]);
+  });
+  it("should log user in when sign up action is dispatched", () => {
+    const reducerState = authReducer(initialState(mockLocalStorage), {
+      type: SIGNUP_USER,
+      payload: {
+        token: "zxcvbnm"
+      }
+    });
+    expect(reducerState.isLoggedIn).toEqual(true);
+    expect(reducerState.token).toEqual("zxcvbnm");
+    expect(reducerState.loading).toEqual(false);
+    expect(reducerState.errorMessages).toEqual([]);
+  });
+  it("should update error messages when SIGNUP_ERROR action is dispatched", () => {
+    const reducerState = authReducer(initialState(mockLocalStorage), {
+      type: SIGNUP_ERROR,
+      payload: [{ password: "Password and confirm password do not match" }]
+    });
+    expect(reducerState.errorMessages).toEqual([
+      { password: "Password and confirm password do not match" }
+    ]);
+    expect(reducerState.loading).toEqual(false);
+  });
+  it("should convert string error message to array when SIGNUP_ERROR action is dispatched", () => {
+    const reducerState = authReducer(initialState(mockLocalStorage), {
+      type: SIGNUP_ERROR,
+      payload: "Invalid User"
+    });
+    expect(reducerState.errorMessages).toEqual([{ error: "Invalid User" }]);
+    expect(reducerState.loading).toEqual(false);
   });
 });

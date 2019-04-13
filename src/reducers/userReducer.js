@@ -5,7 +5,7 @@ import {
   removeDetailsFromLocalStorage
 } from "../local";
 
-import { LOGIN_USER, LOGOUT_USER } from "../actionTypes";
+import { LOGIN_USER, LOGOUT_USER, SIGNUP_USER } from "../actionTypes";
 
 /* eslint-disable indent */
 export const initialState = localStorage => ({
@@ -27,6 +27,12 @@ const userReducer = (state = initialState(localStorage), { type, payload }) => {
       return {
         ...state,
         user: {}
+      };
+    case SIGNUP_USER:
+      addDetailsToLocalStorage({ user: payload.user }, localStorage);
+      return {
+        ...state,
+        user: payload.user
       };
     default:
       return state;

@@ -1,5 +1,5 @@
 import userReducer, { initialState } from "../../reducers/userReducer";
-import { LOGIN_USER, LOGOUT_USER } from "../../actionTypes";
+import { LOGIN_USER, LOGOUT_USER, SIGNUP_USER } from "../../actionTypes";
 
 describe("user reducer's initial state", () => {
   it("should indicate that there is no user data when there is no app data in local storage", () => {
@@ -27,7 +27,7 @@ describe("user reducer's initial state", () => {
 
 describe("user reducer", () => {
   const mockLocalStorage = {};
-  it("should log user in when action is dispatched", () => {
+  it("should log user in when LOGIN_USER action is dispatched", () => {
     const reducerState = userReducer(initialState(mockLocalStorage), {
       type: LOGIN_USER,
       payload: {
@@ -44,5 +44,17 @@ describe("user reducer", () => {
       type: LOGOUT_USER
     });
     expect(reducerState.user).toEqual({});
+  });
+
+  it("should log user in when SIGNUP_USER action is dispatched", () => {
+    const reducerState = userReducer(initialState(mockLocalStorage), {
+      type: SIGNUP_USER,
+      payload: {
+        user: {
+          key: "value"
+        }
+      }
+    });
+    expect(reducerState.user).toEqual({ key: "value" });
   });
 });
