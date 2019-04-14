@@ -5,7 +5,8 @@ import {
   AUTH_LOADING,
   CLEAR_AUTH_ERRORS,
   SIGNUP_USER,
-  SIGNUP_ERROR
+  SIGNUP_ERROR,
+  LOGOUT_USER
 } from "../actionTypes";
 
 /**
@@ -67,5 +68,15 @@ export const signUpUserAction = details => {
 export const clearErrorsAction = () => {
   return {
     type: CLEAR_AUTH_ERRORS
+  };
+};
+
+/**
+ * @description Action for logging user's out
+ * @returns {object} action
+ */
+export const logoutUserAction = () => {
+  return {
+    type: LOGOUT_USER
   };
 };

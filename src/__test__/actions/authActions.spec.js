@@ -4,7 +4,8 @@ import axios from "../../actions/customAxios";
 import {
   loginUserAction,
   clearErrorsAction,
-  signUpUserAction
+  signUpUserAction,
+  logoutUserAction
 } from "../../actions/authActions";
 import mockStore from "../../__mocks__/storeMock";
 import {
@@ -13,10 +14,11 @@ import {
   CLEAR_AUTH_ERRORS,
   LOGIN_ERROR,
   SIGNUP_USER,
-  SIGNUP_ERROR
+  SIGNUP_ERROR,
+  LOGOUT_USER
 } from "../../actionTypes";
 
-describe("Login User Action", () => {
+describe("Login User action creator", () => {
   jest.setTimeout(30000);
   beforeEach(() => {
     moxios.install(axios);
@@ -123,7 +125,7 @@ describe("Login User Action", () => {
   });
 });
 
-describe("Sign Up User Action", () => {
+describe("Sign Up User action creator", () => {
   jest.setTimeout(30000);
   beforeEach(() => {
     moxios.install(axios);
@@ -238,10 +240,18 @@ describe("Sign Up User Action", () => {
   });
 });
 
-describe("Clear Errors Action", () => {
-  it("returns the right action", () => {
+describe("Clear Errors action creator", () => {
+  it("returns the CLEAR_AUTH_ERRORS action", () => {
     expect(clearErrorsAction()).toEqual({
       type: CLEAR_AUTH_ERRORS
+    });
+  });
+});
+
+describe("Logout User action creator", () => {
+  it("returns the LOGOUT_USER action", () => {
+    expect(logoutUserAction()).toEqual({
+      type: LOGOUT_USER
     });
   });
 });

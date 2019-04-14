@@ -14,6 +14,7 @@ import "./css/appCSS.js";
 import LandingPage from "./views/LandingPage";
 import AppLoginPage from "./views/LoginPage";
 import AppSignUpPage from "./views/SignUpPage";
+import AppProfilePage from "./views/ProfilePage";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
         <Route exact path="/" component={LandingPage} />
         <Route exact path="/login" component={AppLoginPage} />
         <Route exact path="/signup" component={AppSignUpPage} />
+        <Route exact path="/profile" component={AppProfilePage} />
       </Switch>
     </BrowserRouter>
   );
