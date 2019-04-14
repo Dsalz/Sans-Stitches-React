@@ -6,3 +6,5 @@ import "./Modal.css";
 import "./Layout/DashboardNavbar.css";
 import "./Layout/DashboardSidebar.css";
 import "./ProfilePage.css";
+import "./Table.css";
+import "./MyRecordsPage.css";

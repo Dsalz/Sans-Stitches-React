@@ -1,0 +1,46 @@
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.dashboard-table thead {
+  background: #d81e5b;
+  color: #fff;
+}
+
+.dashboard-table th,
+td {
+  padding: 15px 0;
+  text-align: center;
+  width: 16%;
+}
+
+.dashboard-table td:first-of-type {
+  width: 40%;
+}
+
+.dashboard-table > tbody tr {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(72, 67, 73, 0.2);
+  cursor: pointer;
+  position: relative;
+}
+
+.dashboard-table > tbody tr:hover {
+  background: rgba(216, 30, 91, 0.1);
+}
+
+.dashboard-table > tbody tr td svg {
+  transform: scale(1.5);
+  display: inline-block;
+}
+
+.dashboard-table > tbody tr td a {
+  display: inline;
+}
+
+.dashboard-table-link {
+  cursor: pointer;
+  padding: 20px;
+}

@@ -15,6 +15,7 @@ import LandingPage from "./views/LandingPage";
 import AppLoginPage from "./views/LoginPage";
 import AppSignUpPage from "./views/SignUpPage";
 import AppProfilePage from "./views/ProfilePage";
+import AppMyRecordsPage from "./views/MyRecordsPage";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route exact path="/login" component={AppLoginPage} />
         <Route exact path="/signup" component={AppSignUpPage} />
         <Route exact path="/profile" component={AppProfilePage} />
+        <Route exact path="/myrecords" component={AppMyRecordsPage} />
       </Switch>
     </BrowserRouter>
   );
