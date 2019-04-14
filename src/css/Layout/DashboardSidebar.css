@@ -1,0 +1,86 @@
+.dashboard-sidebar {
+  width: 220px;
+  height: 100vh;
+  background: #fff;
+  position: fixed;
+  top: 90px;
+  left: 0;
+  z-index: 400;
+  padding: 30px 0;
+  text-align: center;
+  box-shadow: 5px 0 5px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-sidebar-item {
+  display: block;
+  padding: 30px 0;
+  font-size: 20px;
+  color: #484349 !important;
+}
+
+.dashboard-sidebar-item:hover,
+.dashboard-sidebar .active {
+  background: rgba(216, 30, 91, 0.1);
+}
+
+.dashboard-sidebar .active {
+  border-left: 3px solid #d81e5b;
+}
+
+.dashboard-sidebar-toggle {
+  position: absolute;
+  background: white;
+  padding: 10px;
+  top: 0px;
+  right: -56px;
+  cursor: pointer;
+  display: none;
+}
+
+.dashboard-sidebar-toggle hr {
+  border: 2px solid #d81e5b;
+  width: 30px;
+  margin-bottom: 5px;
+}
+
+@media screen and (max-width: 900px) {
+  .dashboard-sidebar {
+    width: 180px;
+    transition: all 0.5s linear;
+  }
+
+  .dashboard-sidebar-item {
+    font-size: 15px;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .dashboard-sidebar {
+    left: -180px;
+  }
+
+  .responsive-sidebar {
+    left: 0;
+    transition: all 0.5s linear;
+  }
+
+  .dashboard-sidebar-toggle {
+    display: block;
+  }
+
+  .responsive-sidebar .dashboard-sidebar-toggle hr:first-of-type {
+    opacity: 0;
+  }
+
+  .responsive-sidebar .dashboard-sidebar-toggle hr:nth-of-type(2) {
+    transition: all 0.3s linear;
+    transform: rotate(45deg);
+  }
+
+  .responsive-sidebar .dashboard-sidebar-toggle hr:last-of-type {
+    transition: all 0.3s linear;
+    transform: rotate(-45deg);
+    position: relative;
+    top: -12px;
+  }
+}

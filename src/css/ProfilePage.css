@@ -1,0 +1,137 @@
+.dashboard-body {
+  display: flex;
+}
+
+.dashboard-main {
+  margin-left: 250px;
+  margin-top: 90px;
+  width: calc(100% - 250px);
+}
+
+.dashboard-card {
+  background: white;
+  width: 90%;
+  margin: 50px auto;
+  padding: 10px;
+}
+
+.dashboard-main-header {
+  font-size: 30px;
+  margin: 15px auto;
+  text-align: center;
+}
+
+.dashboard-main-statistics-section {
+  margin-bottom: 50px;
+}
+.dashboard-main-statistics-section-row {
+  display: flex;
+  justify-content: space-around;
+  margin: 25px auto;
+}
+
+.dashboard-main-statistics-section-row-item {
+  text-align: center;
+  box-shadow: 0 0.625rem 2.5rem 0 rgba(198, 203, 222, 0.45);
+  width: 42%;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.dashboard-main-statistics-section-row-item h3 {
+  font-size: 28px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.dashboard-main-statistics-section-row-item p {
+  font-size: 14px;
+  margin: 5px;
+}
+
+.dashboard-main-statistics-section-row-column {
+  width: 50%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.dashboard-main-statistics-section-row-column-item {
+  width: 80%;
+  margin: 15px auto;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 0.625rem 2.5rem 0 rgba(198, 203, 222, 0.45);
+}
+
+.dashboard-main-statistics-section-row-column-item h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.dashboard-main-statistics-section-row-column-item p {
+  font-size: 14px;
+  margin: 3px;
+}
+
+.dashboard-main-statistics-section-row-column-divider {
+  border: 1px solid rgba(72, 67, 73, 0.2);
+  width: fit-content;
+}
+
+.dashboard-main-generalinfo-section {
+  margin: 30px auto;
+  text-align: center;
+}
+
+.dashboard-main-generalinfo-section-item {
+  color: #484349;
+  font-size: 16px;
+  margin: 10px auto;
+}
+
+@media screen and (max-width: 900px) {
+  .dashboard-main {
+    margin-left: 175px;
+    width: calc(100% - 175px);
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .dashboard-main-statistics-section-row-column-divider {
+    border-width: 1px;
+  }
+  .dashboard-main {
+    margin-left: 0;
+    width: 100%;
+  }
+  .dashboard-main-statistics-section-row-column {
+    width: 45%;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .dashboard-main-statistics-section-row-item {
+    width: 40%;
+  }
+
+  .dashboard-main-statistics-section-row-item h3 {
+    font-size: 24px;
+  }
+
+  .dashboard-main-statistics-section-row-item p {
+    font-size: 12px;
+  }
+
+  .dashboard-main-generalinfo-section-item {
+    font-size: 14px;
+  }
+
+  .dashboard-main-statistics-section-row-column-item h3 {
+    font-size: 18px;
+  }
+
+  .dashboard-main-statistics-section-row-column-item p {
+    font-size: 12px;
+  }
+}
