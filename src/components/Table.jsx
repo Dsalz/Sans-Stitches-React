@@ -29,7 +29,8 @@ const formatDate = dateTime => {
 };
 
 export const Table = ({ data, history, allowEdit }) => {
-  const goToRecordDetail = id => history.push(`/record/${id}`);
+  const goToRecordDetail = (id, type) =>
+    history.push(`/record/${type.toLowerCase().replace("-", "")}-${id}`);
   return (
     <table className="dashboard-table">
       <thead>
@@ -47,7 +48,7 @@ export const Table = ({ data, history, allowEdit }) => {
           <tr
             key={item.id}
             className="dashboard-table-row"
-            onClick={() => goToRecordDetail(item.id)}
+            onClick={() => goToRecordDetail(item.id, item.type)}
           >
             <td> {item.comment} </td>
             <td> {capitalize(item.type)} </td>
@@ -61,7 +62,9 @@ export const Table = ({ data, history, allowEdit }) => {
               {item.status === "pending review" && allowEdit && (
                 <Link
                   className="dashboard-table-link edit-link"
-                  to={`/edit-record/${item.id}`}
+                  to={`/edit-record/${item.type
+                    .toLowerCase()
+                    .replace("-", "")}-${item.id}`}
                 >
                   <svg
                     id="edit-svg"

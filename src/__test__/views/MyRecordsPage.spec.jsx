@@ -8,7 +8,7 @@ import {
   mapDispatchToProps
 } from "../../views/MyRecordsPage";
 
-describe("Profile Page component", () => {
+describe("My Records Page component", () => {
   const mockFetchMyRecords = jest.fn();
   const mockClearErrors = jest.fn();
   const mockFunction = jest.fn();

@@ -1,11 +1,11 @@
 import React from "react";
-import PropTypes from "prop-types";
+import { string, func, node } from "prop-types";
 
 /**
  * @description svg to depict loading state component
  * @returns {HTMLSvgElement} svg
  */
-const Modal = ({ modalHeader, modalText, onClose }) => (
+const Modal = ({ modalHeader, modalText, onClose, children }) => (
   <div className="modal" id="modal">
     <div
       className="modal-backdrop"
@@ -27,15 +27,21 @@ const Modal = ({ modalHeader, modalText, onClose }) => (
       </section>
       <section className="modal-body">
         <p className="modal-body-text">{modalText}</p>
+        {children}
       </section>
     </section>
   </div>
 );
 
 Modal.propTypes = {
-  modalHeader: PropTypes.string.isRequired,
-  modalText: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired
+  modalHeader: string.isRequired,
+  modalText: string.isRequired,
+  onClose: func.isRequired,
+  children: node
+};
+
+Modal.defaultProps = {
+  children: ""
 };
 
 export default Modal;
