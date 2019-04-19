@@ -3,7 +3,7 @@ import React from "react";
 import { shallow } from "enzyme";
 import {
   ProfilePage,
-  state,
+  getState,
   mapStateToProps,
   mapDispatchToProps
 } from "../../views/ProfilePage";
@@ -28,7 +28,7 @@ describe("Profile Page component", () => {
     ],
     token: "zxcv",
     loading: false,
-    errorMessage: "",
+    errorMessages: [],
     firstname: "John",
     lastname: "David",
     email: "johnny@yahoo.com",
@@ -136,7 +136,7 @@ describe("Profile Page component", () => {
   });
   it("fires the function to update the records as soon as it is mounted and updates it's state so as not to make subsequent calls", () => {
     expect(mockFetchMyRecords.mock.calls.length).toEqual(1);
-    expect(state.updatedRecords).toEqual(true);
+    expect(getState().updatedRecords).toEqual(true);
   });
   it("shows the loading svg while loading", () => {
     const loadingProfilePage = shallow(
@@ -153,7 +153,7 @@ describe("Profile Page component", () => {
       <ProfilePage
         fetchMyRecords={mockFetchMyRecords}
         clearErrors={mockClearErrors}
-        {...{ ...mockProps, errorMessage: "Network Error" }}
+        {...{ ...mockProps, errorMessages: [{ error: "Network Error" }] }}
       />
     );
     expect(errorProfilePage.find("Modal").exists()).toBe(true);
@@ -173,7 +173,7 @@ describe("Profile Page component", () => {
       myInterventionRecords,
       myRedFlagRecords,
       loading,
-      errorMessage
+      errorMessages
     } = mockProps;
     const mockStore = {
       auth: {
@@ -192,7 +192,7 @@ describe("Profile Page component", () => {
         myRedFlagRecords,
         myInterventionRecords,
         loading,
-        errorMessage
+        errorMessages
       }
     };
     const mockDispatch = action => `Mocked Dispatch of ${action}`;
@@ -208,7 +208,7 @@ describe("Profile Page component", () => {
     expect(profilePageProps.isAdmin).toEqual(isAdmin);
     expect(profilePageProps.token).toEqual(token);
     expect(profilePageProps.loading).toEqual(loading);
-    expect(profilePageProps.errorMessage).toEqual(errorMessage);
+    expect(profilePageProps.errorMessages).toEqual(errorMessages);
     expect(profilePageProps.myInterventionRecords).toEqual(
       myInterventionRecords
     );

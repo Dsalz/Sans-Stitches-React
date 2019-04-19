@@ -3,7 +3,10 @@ import {
   RECORDS_LOADING,
   GOT_MY_RECORDS,
   ERROR_GETTING_RECORDS,
-  CLEAR_RECORD_ERRORS
+  CLEAR_RECORD_ERRORS,
+  CREATED_RECORD,
+  ERROR_CREATING_RECORD,
+  RESET_CREATED_RECORD
 } from "../../actionTypes";
 
 describe("record reducer's initial state", () => {
@@ -13,7 +16,7 @@ describe("record reducer's initial state", () => {
     });
     expect(reducerState.myRedFlagRecords).toEqual([]);
     expect(reducerState.myInterventionRecords).toEqual([]);
-    expect(reducerState.errorMessage).toEqual("");
+    expect(reducerState.errorMessages).toEqual([]);
     expect(reducerState.loading).toEqual(false);
   });
 });
@@ -45,29 +48,67 @@ describe("record reducer", () => {
       mockPayload.interventionRecords
     );
     expect(reducerState.loading).toEqual(false);
-    expect(reducerState.errorMessage).toEqual("");
+    expect(reducerState.errorMessages).toEqual([]);
   });
 
-  it("should update error message when ERROR_GETTING_RECORDS action is dispatched", () => {
+  it("should update error messages when ERROR_GETTING_RECORDS action is dispatched", () => {
     const reducerState = recordReducer(undefined, {
       type: ERROR_GETTING_RECORDS
     });
-    expect(reducerState.errorMessage).toEqual(
-      "Error getting records, please check your connection and try again later"
-    );
+    expect(reducerState.errorMessages).toEqual([
+      {
+        error:
+          "Error getting records, please check your connection and try again later"
+      }
+    ]);
     expect(reducerState.loading).toEqual(false);
   });
 
-  it("should clear error message when CLEAR_RECORD_ERRORS action is dispatched", () => {
+  it("should clear error messages when CLEAR_RECORD_ERRORS action is dispatched", () => {
     const initialReducerState = recordReducer(undefined, {
       type: ERROR_GETTING_RECORDS
     });
-    expect(initialReducerState.errorMessage).toEqual(
-      "Error getting records, please check your connection and try again later"
-    );
+    expect(initialReducerState.errorMessages).toEqual([
+      {
+        error:
+          "Error getting records, please check your connection and try again later"
+      }
+    ]);
     const reducerState = recordReducer(initialReducerState, {
       type: CLEAR_RECORD_ERRORS
     });
-    expect(reducerState.errorMessage).toEqual("");
+    expect(reducerState.errorMessages).toEqual([]);
+  });
+
+  it("should update the createdRecordMessage field in it's state when CREATED_RECORD action is dispatched", () => {
+    const initialReducerState = recordReducer(undefined, {
+      type: CREATED_RECORD,
+      payload: "Successfully created red flag record"
+    });
+    expect(initialReducerState.createdRecordMessage).toEqual(
+      "Successfully created red flag record"
+    );
+    expect(initialReducerState.loading).toEqual(false);
+  });
+
+  it("should update it's state correctly when ERROR_CREATING_RECORD action is dispatched", () => {
+    const reducerState = recordReducer(undefined, {
+      type: ERROR_CREATING_RECORD
+    });
+    expect(reducerState.errorMessages).toEqual([
+      {
+        error:
+          "Error creating record, please check your connection and try again later"
+      }
+    ]);
+    expect(reducerState.loading).toEqual(false);
+    expect(reducerState.createdRecordMessage).toEqual("");
+  });
+  it("should reset the created message when RESET_CREATED_RECORD action is dispatched", () => {
+    const reducerState = recordReducer(undefined, {
+      type: RESET_CREATED_RECORD
+    });
+    expect(reducerState.createdRecordMessage).toEqual("");
+    expect(reducerState.errorMessages).toEqual([]);
   });
 });

@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { mount, shallow } from "enzyme";
 import {
   SignUpPage,
-  state,
+  getState,
   mapDispatchToProps,
   mapStateToProps
 } from "../../views/SignUpPage";
@@ -79,23 +79,23 @@ describe("Sign Up Page View", () => {
     signUpPage
       .find("input#name")
       .simulate("change", { target: { name: "name", value: "abcd" } });
-    expect(state.name).toEqual("abcd");
+    expect(getState().name).toEqual("abcd");
     signUpPage
       .find("input#email")
       .simulate("change", { target: { name: "email", value: "abc" } });
-    expect(state.email).toEqual("abc");
+    expect(getState().email).toEqual("abc");
     signUpPage.find("input#phonenumber").simulate("change", {
       target: { name: "phoneNumber", value: "08011223233" }
     });
-    expect(state.phoneNumber).toEqual("08011223233");
+    expect(getState().phoneNumber).toEqual("08011223233");
     signUpPage
       .find("input#password")
       .simulate("change", { target: { name: "password", value: "zxcv" } });
-    expect(state.password).toEqual("zxcv");
+    expect(getState().password).toEqual("zxcv");
     signUpPage.find("input#confirmpassword").simulate("change", {
       target: { name: "confirmPassword", value: "zxcv" }
     });
-    expect(state.confirmPassword).toEqual("zxcv");
+    expect(getState().confirmPassword).toEqual("zxcv");
   });
 
   it("fires the signUserIn function when the form is submitted", () => {

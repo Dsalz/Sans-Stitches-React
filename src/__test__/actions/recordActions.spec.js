@@ -1,13 +1,20 @@
 import "babel-polyfill";
 import moxios from "moxios";
 import axios from "../../actions/customAxios";
-import { getMyRecords, clearRecordErrors } from "../../actions/recordActions";
+import {
+  getMyRecords,
+  clearRecordErrors,
+  resetCreateRecordMessage,
+  createNewRecord
+} from "../../actions/recordActions";
 import mockStore from "../../__mocks__/storeMock";
 import {
   RECORDS_LOADING,
   GOT_MY_RECORDS,
   ERROR_GETTING_RECORDS,
-  CLEAR_RECORD_ERRORS
+  CLEAR_RECORD_ERRORS,
+  RESET_CREATED_RECORD,
+  ERROR_CREATING_RECORD
 } from "../../actionTypes";
 
 describe("Get my records action creator", () => {
@@ -20,7 +27,7 @@ describe("Get my records action creator", () => {
     moxios.uninstall(axios);
   });
 
-  it("dispatches GOT_MY_RECORDS type action with the expected payload when login is successful", async done => {
+  it("dispatches GOT_MY_RECORDS type action with the expected payload when records are fetched successfully", async done => {
     const store = mockStore({
       myRedFlagRecords: [],
       myInterventionRecords: [],
@@ -141,21 +148,9 @@ describe("Get my records action creator", () => {
       }
     };
 
-    const mockInterventionResponse = {
-      status: 500,
-      response: {
-        status: 500
-      }
-    };
-
     moxios.wait(() => {
       const redFlagRequest = moxios.requests.at(0);
-      redFlagRequest.respondWith(mockRedFlagResponse).then(() => {
-        moxios.wait(() => {
-          const interventionRequest = moxios.requests.at(1);
-          interventionRequest.respondWith(mockInterventionResponse);
-        });
-      });
+      redFlagRequest.respondWith(mockRedFlagResponse);
     });
 
     await store.dispatch(getMyRecords(mockToken));
@@ -169,10 +164,161 @@ describe("Get my records action creator", () => {
   });
 });
 
+describe("Create record action creator", () => {
+  jest.setTimeout(30000);
+  beforeEach(() => {
+    moxios.install(axios);
+  });
+
+  afterEach(() => {
+    moxios.uninstall(axios);
+  });
+
+  it("dispatches RECORDS_LOADING type action before making request", async done => {
+    jest.setTimeout(30000);
+    const store = mockStore({
+      myRedFlagRecords: [],
+      myInterventionRecords: [],
+      loading: false,
+      errorMessages: [],
+      createdRecordMessage: ""
+    });
+    const mockToken = "zxcv";
+    const mockDetails = {
+      comment: "abcd",
+      type: "Red Flag",
+      description: "zxcvb",
+      latitude: "1.111",
+      longitude: "3.33",
+      video: "www.djdfjdj.com/kjkjj.mp4"
+    };
+    const mockSuccessMessage = "Created red flag record successfully";
+
+    const mockCreateResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: [{ message: mockSuccessMessage, id: 1 }]
+      }
+    };
+
+    moxios.wait(() => {
+      const createRecordRequest = moxios.requests.at(0);
+      createRecordRequest.respondWith(mockCreateResponse);
+    });
+
+    await store.dispatch(createNewRecord(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toContain(RECORDS_LOADING);
+    done();
+  });
+
+  it("dispatches ERROR_CREATING_RECORD type action when attempt to fetch records is unsuccessful due to user error when creating", async done => {
+    const store = mockStore({
+      myRedFlagRecords: [],
+      myInterventionRecords: [],
+      loading: false,
+      errorMessages: [],
+      createdRecordMessage: ""
+    });
+    const mockToken = "zxcv";
+    const mockDetails = {
+      comment: "abcd",
+      type: "Red Flag",
+      description: "zxcvb",
+      latitude: "abcd",
+      longitude: "abcd",
+      images: ["image1.jpg", "image2.jpg"],
+      video: "www.djdfjdj.com/kjkjj.mp4"
+    };
+    const mockErrorMessage = "Invalid Location Data";
+
+    const mockCreateResponse = {
+      status: 200,
+      response: {
+        status: 400,
+        error: mockErrorMessage
+      }
+    };
+
+    moxios.wait(() => {
+      const createRecordRequest = moxios.requests.at(0);
+      createRecordRequest.respondWith(mockCreateResponse);
+    });
+
+    await store.dispatch(createNewRecord(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_CREATING_RECORD]);
+    done();
+  });
+
+  it("dispatches ERROR_CREATING_RECORD type action when attempt to fetch records is unsuccessful due to user error when patching", async done => {
+    const store = mockStore({
+      myRedFlagRecords: [],
+      myInterventionRecords: [],
+      loading: false,
+      errorMessages: [],
+      createdRecordMessage: ""
+    });
+    const mockToken = "zxcv";
+    const mockDetails = {
+      comment: "abcd",
+      type: "Red Flag",
+      description: "zxcvb",
+      latitude: "abcd",
+      longitude: "abcd",
+      images: ["image1.jpg", "image2.jpg"],
+      video: "www.djdfjdj.com/kjkjj.mp4"
+    };
+    const mockErrorMessage = "Image(s) too large";
+
+    const mockSuccessMessage = "Created red flag record successfully";
+
+    const mockCreateResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: [{ message: mockSuccessMessage, id: 1 }]
+      }
+    };
+
+    const mockPatchResponse = {
+      status: 200,
+      response: {
+        status: 400,
+        error: mockErrorMessage
+      }
+    };
+
+    moxios.wait(() => {
+      const createRecordRequest = moxios.requests.at(0);
+      createRecordRequest.respondWith(mockCreateResponse).then(() => {
+        moxios.wait(() => {
+          const patchRecordRequest = moxios.requests.at(1);
+          patchRecordRequest.respondWith(mockPatchResponse);
+        });
+      });
+    });
+
+    await store.dispatch(createNewRecord(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_CREATING_RECORD]);
+    done();
+  });
+});
+
 describe("Clear record errors action creator", () => {
   it("returns the CLEAR_RECORD_ERRORS action", () => {
     expect(clearRecordErrors()).toEqual({
       type: CLEAR_RECORD_ERRORS
+    });
+  });
+});
+
+describe("Reset created record message action creator", () => {
+  it("returns the RESET_CREATED_RECORD action", () => {
+    expect(resetCreateRecordMessage()).toEqual({
+      type: RESET_CREATED_RECORD
     });
   });
 });

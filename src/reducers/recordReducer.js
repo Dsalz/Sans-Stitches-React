@@ -2,7 +2,10 @@ import {
   RECORDS_LOADING,
   GOT_MY_RECORDS,
   ERROR_GETTING_RECORDS,
-  CLEAR_RECORD_ERRORS
+  CLEAR_RECORD_ERRORS,
+  CREATED_RECORD,
+  ERROR_CREATING_RECORD,
+  RESET_CREATED_RECORD
 } from "../actionTypes";
 
 /* eslint-disable indent */
@@ -10,7 +13,8 @@ const initialState = {
   myRedFlagRecords: [],
   myInterventionRecords: [],
   loading: false,
-  errorMessage: ""
+  errorMessages: [],
+  createdRecordMessage: ""
 };
 
 const recordReducer = (state = initialState, { type, payload }) => {
@@ -19,7 +23,7 @@ const recordReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         loading: true,
-        errorMessage: ""
+        errorMessages: []
       };
     case GOT_MY_RECORDS:
       return {
@@ -27,19 +31,48 @@ const recordReducer = (state = initialState, { type, payload }) => {
         myRedFlagRecords: payload.redFlagRecords,
         myInterventionRecords: payload.interventionRecords,
         loading: false,
-        errorMessage: ""
+        errorMessages: []
       };
     case ERROR_GETTING_RECORDS:
       return {
         ...state,
-        errorMessage:
-          "Error getting records, please check your connection and try again later",
+        errorMessages: [
+          {
+            error:
+              "Error getting records, please check your connection and try again later"
+          }
+        ],
+        loading: false
+      };
+    case CREATED_RECORD:
+      return {
+        ...state,
+        createdRecordMessage: payload,
+        loading: false
+      };
+    case ERROR_CREATING_RECORD:
+      return {
+        ...state,
+        errorMessages: [
+          {
+            error:
+              "Error creating record, please check your connection and try again later"
+          }
+        ],
+        createdRecordMessage: "",
         loading: false
       };
     case CLEAR_RECORD_ERRORS:
       return {
         ...state,
-        errorMessage: ""
+        errorMessages: [],
+        createdRecordMessage: ""
+      };
+    case RESET_CREATED_RECORD:
+      return {
+        ...state,
+        createdRecordMessage: "",
+        errorMessages: []
       };
     default:
       return state;
