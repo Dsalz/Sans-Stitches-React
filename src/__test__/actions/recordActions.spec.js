@@ -5,7 +5,10 @@ import {
   getMyRecords,
   clearRecordErrors,
   resetCreateRecordMessage,
-  createNewRecord
+  createNewRecord,
+  fetchRecordAction,
+  deleteRecordAction,
+  resetDeletedRecordAction
 } from "../../actions/recordActions";
 import mockStore from "../../__mocks__/storeMock";
 import {
@@ -14,7 +17,12 @@ import {
   ERROR_GETTING_RECORDS,
   CLEAR_RECORD_ERRORS,
   RESET_CREATED_RECORD,
-  ERROR_CREATING_RECORD
+  ERROR_CREATING_RECORD,
+  GOT_RECORD,
+  ERROR_GETTING_RECORD,
+  RECORD_DELETED,
+  ERROR_DELETING_RECORD,
+  RESET_DELETED_RECORD
 } from "../../actionTypes";
 
 describe("Get my records action creator", () => {
@@ -319,6 +327,171 @@ describe("Reset created record message action creator", () => {
   it("returns the RESET_CREATED_RECORD action", () => {
     expect(resetCreateRecordMessage()).toEqual({
       type: RESET_CREATED_RECORD
+    });
+  });
+});
+
+describe("Get record action creator", () => {
+  jest.setTimeout(30000);
+  beforeEach(() => {
+    moxios.install(axios);
+  });
+
+  afterEach(() => {
+    moxios.uninstall(axios);
+  });
+
+  it("dispatches GOT_RECORD type when record was gotten successfully", async done => {
+    const store = mockStore({});
+    const mockRecordInfo = "redflag-11";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: [{ id: 11 }]
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(fetchRecordAction(mockRecordInfo));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, GOT_RECORD]);
+    done();
+  });
+
+  it("dispatches ERROR_GETTING_RECORD type action when attempt to fetch records is unsuccessful due to user error", async done => {
+    const store = mockStore({});
+    const mockRecordInfo = "redflag-11";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 403,
+        error: "Forbidden"
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(fetchRecordAction(mockRecordInfo));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_GETTING_RECORD]);
+    done();
+  });
+
+  it("dispatches ERROR_GETTING_RECORD type action when attempt to fetch records is unsuccessful due to a server error", async done => {
+    const store = mockStore({});
+    const mockRecordInfo = "redflag-11";
+
+    const mockResponse = {
+      status: 500,
+      response: {
+        status: 500
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(fetchRecordAction(mockRecordInfo));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_GETTING_RECORD]);
+    done();
+  });
+});
+describe("Delete record action creator", () => {
+  jest.setTimeout(30000);
+  beforeEach(() => {
+    moxios.install(axios);
+  });
+
+  afterEach(() => {
+    moxios.uninstall(axios);
+  });
+
+  it("dispatches RECORD_DELETED type action when record was deleted successfully", async done => {
+    const store = mockStore({});
+    const mockRecordInfo = "redflag-11";
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 200
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(deleteRecordAction(mockToken, mockRecordInfo));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, RECORD_DELETED]);
+    done();
+  });
+
+  it("dispatches ERROR_DELETING_RECORD type action when attempt to delete records is unsuccessful due to user error", async done => {
+    const store = mockStore({});
+    const mockRecordInfo = "redflag-11";
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 403,
+        error: "Forbidden"
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(deleteRecordAction(mockToken, mockRecordInfo));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_DELETING_RECORD]);
+    done();
+  });
+
+  it("dispatches ERROR_DELETING_RECORD type action when attempt to delete records is unsuccessful due to a server error", async done => {
+    const store = mockStore({});
+    const mockRecordInfo = "redflag-11";
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 500,
+      response: {}
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(deleteRecordAction(mockToken, mockRecordInfo));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_DELETING_RECORD]);
+    done();
+  });
+});
+
+describe("Reset deleted record action creator", () => {
+  it("returns the RESET_DELETED_RECORD action", () => {
+    expect(resetDeletedRecordAction()).toEqual({
+      type: RESET_DELETED_RECORD
     });
   });
 });

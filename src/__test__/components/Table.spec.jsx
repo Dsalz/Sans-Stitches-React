@@ -75,7 +75,7 @@ describe("Dashboard Navbar component", () => {
       .find("tr.dashboard-table-row")
       .first()
       .simulate("click");
-    expect(mockHistory[0]).toEqual(`/record/${mockData[0].id}`);
+    expect(mockHistory[0]).toEqual(`/record/redflag-${mockData[0].id}`);
   });
   it("does not propagate clicks on the edit link to the parent row ", () => {
     const mockStopPropagation = jest.fn();

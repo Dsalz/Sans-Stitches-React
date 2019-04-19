@@ -9,3 +9,4 @@ import "./ProfilePage.css";
 import "./Table.css";
 import "./MyRecordsPage.css";
 import "./CreateRecordPage.css";
+import "./RecordDetailsPage.css";

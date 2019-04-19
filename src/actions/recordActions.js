@@ -6,7 +6,12 @@ import {
   CLEAR_RECORD_ERRORS,
   CREATED_RECORD,
   ERROR_CREATING_RECORD,
-  RESET_CREATED_RECORD
+  RESET_CREATED_RECORD,
+  ERROR_GETTING_RECORD,
+  GOT_RECORD,
+  RECORD_DELETED,
+  RESET_DELETED_RECORD,
+  ERROR_DELETING_RECORD
 } from "../actionTypes";
 
 /**
@@ -129,3 +134,75 @@ export const createNewRecord = (token, details) => {
  * @returns {function} dispatch function with the appropriate action
  */
 export const resetCreateRecordMessage = () => ({ type: RESET_CREATED_RECORD });
+
+/**
+ * @description Action for fetching record details
+ * @param {object} recordInfo The id and type of the record
+ * @returns {function} dispatch function with the appropriate action
+ */
+export const fetchRecordAction = recordInfo => {
+  return async dispatch => {
+    const type =
+      recordInfo.split("-")[0] === "redflag" ? "red-flags" : "interventions";
+    const id = recordInfo.split("-")[1];
+    dispatch({ type: RECORDS_LOADING });
+    try {
+      const response = await axios.get(`/${type}/${id}`);
+      const { data, error } = response.data;
+      if (error) {
+        return dispatch({
+          type: ERROR_GETTING_RECORD,
+          payload: error
+        });
+      }
+      return dispatch({
+        type: GOT_RECORD,
+        payload: data[0]
+      });
+    } catch (err) {
+      return dispatch({
+        type: ERROR_GETTING_RECORD
+      });
+    }
+  };
+};
+
+/**
+ * @description Action for deleting record details
+ * @param {object} token The user's token
+ * @param {object} recordInfo The id and type of the record
+ * @returns {function} dispatch function with the appropriate action
+ */
+export const deleteRecordAction = (token, recordInfo) => {
+  return async dispatch => {
+    const type =
+      recordInfo.split("-")[0] === "redflag" ? "red-flags" : "interventions";
+    const id = recordInfo.split("-")[1];
+    dispatch({ type: RECORDS_LOADING });
+    try {
+      const response = await axios.delete(`/${type}/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const { error } = response.data;
+      if (error) {
+        return dispatch({
+          type: ERROR_DELETING_RECORD,
+          payload: error
+        });
+      }
+      return dispatch({
+        type: RECORD_DELETED
+      });
+    } catch (err) {
+      return dispatch({
+        type: ERROR_DELETING_RECORD
+      });
+    }
+  };
+};
+
+/**
+ * @description Action for resetting created record status
+ * @returns {function} dispatch function with the appropriate action
+ */
+export const resetDeletedRecordAction = () => ({ type: RESET_DELETED_RECORD });
