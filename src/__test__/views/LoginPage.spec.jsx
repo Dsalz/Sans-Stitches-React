@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { mount, shallow } from "enzyme";
 import {
   LoginPage,
-  state,
+  getState,
   mapDispatchToProps,
   mapStateToProps
 } from "../../views/LoginPage";
@@ -79,7 +79,7 @@ describe("Login Page View", () => {
     loginPage
       .find("input#email")
       .simulate("change", { target: { name: "email", value: "abc" } });
-    expect(state.email).toEqual("abc");
+    expect(getState().email).toEqual("abc");
   });
 
   it("fires the logUserIn a when form is submitted", () => {

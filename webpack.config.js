@@ -1,6 +1,9 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCSSExtractPlugin = require("mini-css-extract-plugin");
+const Dotenv = require("dotenv-webpack");
+const webpack = require("webpack");
+require("dotenv").config();
 
 const htmlPlugin = new HtmlWebpackPlugin({
   template: "./src/index.html",
@@ -9,6 +12,11 @@ const htmlPlugin = new HtmlWebpackPlugin({
 
 const cssPlugin = new MiniCSSExtractPlugin({
   filename: "./assets/css/styles.css"
+});
+
+const dotEnvPlugin = new Dotenv();
+const webpackEnvPlugins = new webpack.DefinePlugin({
+  "process.env.GOOGLE_SECRET_KEY": JSON.stringify(process.env.GOOGLE_SECRET_KEY)
 });
 
 module.exports = {
@@ -31,6 +39,10 @@ module.exports = {
       ".gif",
       ".svg"
     ]
+  },
+  node: {
+    net: "empty",
+    fs: "empty"
   },
   module: {
     rules: [
@@ -78,5 +90,5 @@ module.exports = {
   devServer: {
     historyApiFallback: true
   },
-  plugins: [htmlPlugin, cssPlugin]
+  plugins: [htmlPlugin, cssPlugin, dotEnvPlugin, webpackEnvPlugins]
 };

@@ -18,6 +18,15 @@ button:hover {
   box-shadow: 0 0.625rem 2.5rem 0 rgba(198, 203, 222, 0.45);
 }
 
+button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+button {
+  cursor: pointer;
+}
+
 input:focus,
 textarea:focus {
   outline: none;

@@ -11,8 +11,10 @@ import LoadingSvg from "../components/LoadingSvg";
 // Actions
 import { signUpUserAction, clearErrorsAction } from "../actions/authActions";
 
-// eslint-disable-next-line import/no-mutable-exports
-export let state, setState;
+let state, setState;
+
+export const getState = () => state;
+
 export const SignUpPage = ({
   signUserIn,
   isLoggedIn,

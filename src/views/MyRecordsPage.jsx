@@ -14,8 +14,9 @@ import AppTable from "../components/Table";
 // Actions
 import { getMyRecords, clearRecordErrors } from "../actions/recordActions";
 
-// eslint-disable-next-line import/no-mutable-exports
-export let state, setState;
+let state, setState;
+
+export const getState = () => state;
 
 export const MyRecordsPage = ({
   myRedFlagRecords,
@@ -23,7 +24,7 @@ export const MyRecordsPage = ({
   fetchMyRecords,
   token,
   loading,
-  errorMessage,
+  errorMessages,
   clearErrors,
   isAdmin
 }) => {
@@ -73,10 +74,10 @@ export const MyRecordsPage = ({
   return (
     <div className="blue-bg dashboard-body">
       {loading && <LoadingSVG />}
-      {errorMessage && (
+      {errorMessages.length && (
         <Modal
           modalHeader="Error"
-          modalText={errorMessage}
+          modalText={errorMessages[0].error}
           onClose={clearErrors}
         />
       )}
@@ -115,20 +116,15 @@ export const mapStateToProps = ({ auth, records, user }) => {
     myRedFlagRecords,
     myInterventionRecords,
     loading,
-    errorMessage
+    errorMessages
   } = records;
   const { token } = auth;
-  const { firstname, lastname, email } = user.user;
   return {
     myRedFlagRecords,
     myInterventionRecords,
     token,
     loading,
-    errorMessage,
-    firstname,
-    lastname,
-    email,
-    phoneNumber: user.user.phone_number,
+    errorMessages,
     isAdmin: user.user.is_admin
   };
 };
@@ -166,9 +162,9 @@ MyRecordsPage.propTypes = {
    */
   loading: bool.isRequired,
   /**
-   * Error message that may arise from fetching records
+   * Error messages that may arise from fetching records
    */
-  errorMessage: string,
+  errorMessages: arrayOf(object),
   /**
    * User's Admin Status
    */
@@ -176,7 +172,7 @@ MyRecordsPage.propTypes = {
 };
 
 MyRecordsPage.defaultProps = {
-  errorMessage: "",
+  errorMessages: [],
   isAdmin: false
 };
 

@@ -12,8 +12,9 @@ import Modal from "../components/Modal";
 // Actions
 import { getMyRecords, clearRecordErrors } from "../actions/recordActions";
 
-// eslint-disable-next-line import/no-mutable-exports
-export let state, setState;
+let state, setState;
+
+export const getState = () => state;
 
 export const ProfilePage = ({
   myRedFlagRecords,
@@ -21,7 +22,7 @@ export const ProfilePage = ({
   fetchMyRecords,
   token,
   loading,
-  errorMessage,
+  errorMessages,
   clearErrors,
   phoneNumber,
   isAdmin,
@@ -74,10 +75,10 @@ export const ProfilePage = ({
   return (
     <div className="blue-bg dashboard-body">
       {loading && <LoadingSVG />}
-      {errorMessage && (
+      {errorMessages.length && (
         <Modal
           modalHeader="Error"
-          modalText={errorMessage}
+          modalText={errorMessages[0].error}
           onClose={clearErrors}
         />
       )}
@@ -264,7 +265,7 @@ export const mapStateToProps = ({ auth, records, user }) => {
     myRedFlagRecords,
     myInterventionRecords,
     loading,
-    errorMessage
+    errorMessages
   } = records;
   const { token } = auth;
   const { firstname, lastname, email } = user.user;
@@ -273,7 +274,7 @@ export const mapStateToProps = ({ auth, records, user }) => {
     myInterventionRecords,
     token,
     loading,
-    errorMessage,
+    errorMessages,
     firstname,
     lastname,
     email,
@@ -317,7 +318,7 @@ ProfilePage.propTypes = {
   /**
    * Error message that may arise from fetching records
    */
-  errorMessage: string,
+  errorMessages: arrayOf(object),
   /**
    * User's phone number
    */
@@ -341,7 +342,7 @@ ProfilePage.propTypes = {
 };
 
 ProfilePage.defaultProps = {
-  errorMessage: "",
+  errorMessages: [],
   phoneNumber: "",
   isAdmin: false,
   firstname: "",

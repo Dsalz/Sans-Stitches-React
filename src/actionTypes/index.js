@@ -1,3 +1,4 @@
+// Auth Action Types
 export const AUTH_LOADING = "AUTH_LOADING";
 export const LOGIN_USER = "LOGIN_USER";
 export const LOGIN_ERROR = "LOGIN_ERROR";
@@ -5,7 +6,12 @@ export const CLEAR_AUTH_ERRORS = "CLEAR_AUTH_ERRORS";
 export const LOGOUT_USER = "LOGOUT_USER";
 export const SIGNUP_USER = "SIGNUP_USER";
 export const SIGNUP_ERROR = "SIGNUP_ERROR";
+
+// Record Action Types
 export const GOT_MY_RECORDS = "GOT_MY_RECORDS";
 export const ERROR_GETTING_RECORDS = "ERROR_GETTING_RECORDS";
 export const CLEAR_RECORD_ERRORS = "CLEAR_RECORD_ERRORS";
 export const RECORDS_LOADING = "RECORDS_LOADING";
+export const CREATED_RECORD = "CREATED_RECORD";
+export const ERROR_CREATING_RECORD = "ERROR_CREATING_RECORD";
+export const RESET_CREATED_RECORD = "RESET_CREATED_RECORD";

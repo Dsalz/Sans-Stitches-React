@@ -3,7 +3,7 @@ import React from "react";
 import { shallow } from "enzyme";
 import {
   MyRecordsPage,
-  state,
+  getState,
   mapStateToProps,
   mapDispatchToProps
 } from "../../views/MyRecordsPage";
@@ -29,7 +29,7 @@ describe("Profile Page component", () => {
     ],
     token: "zxcv",
     loading: false,
-    errorMessage: "",
+    errorMessages: [],
     isAdmin: false
   };
   const myRecordsPage = shallow(
@@ -49,7 +49,7 @@ describe("Profile Page component", () => {
   });
   it("fires the function to update the records as soon as it is mounted and updates it's state so as not to make subsequent calls", () => {
     expect(mockFetchMyRecords.mock.calls.length).toEqual(1);
-    expect(state.updatedRecords).toEqual(true);
+    expect(getState().updatedRecords).toEqual(true);
   });
   it("redirects to the admin dashboard if user is an admin", () => {
     const adminMyRecordsPage = shallow(
@@ -79,7 +79,7 @@ describe("Profile Page component", () => {
       <MyRecordsPage
         fetchMyRecords={mockFunction}
         clearErrors={mockFunction}
-        {...{ ...mockProps, errorMessage: "Network Error" }}
+        {...{ ...mockProps, errorMessages: [{ error: "Network Error" }] }}
       />
     );
     expect(errorMyRecordsPage.find("Modal").exists()).toBe(true);
@@ -94,19 +94,19 @@ describe("Profile Page component", () => {
     myRecordsPage
       .find("select#dashboard-table-select")
       .simulate("change", { target: { value: "Resolved" } });
-    expect(state.filterOption).toEqual("Resolved");
+    expect(getState().filterOption).toEqual("Resolved");
     myRecordsPage
       .find("select#dashboard-table-select")
       .simulate("change", { target: { value: "Rejected" } });
-    expect(state.filterOption).toEqual("Rejected");
+    expect(getState().filterOption).toEqual("Rejected");
     myRecordsPage
       .find("select#dashboard-table-select")
       .simulate("change", { target: { value: "Pending" } });
-    expect(state.filterOption).toEqual("Pending");
+    expect(getState().filterOption).toEqual("Pending");
     myRecordsPage
       .find("select#dashboard-table-select")
       .simulate("change", { target: { value: "Under-Investigation" } });
-    expect(state.filterOption).toEqual("Under-Investigation");
+    expect(getState().filterOption).toEqual("Under-Investigation");
   });
 
   it("receives the right props from the store", () => {
@@ -116,7 +116,7 @@ describe("Profile Page component", () => {
       myInterventionRecords,
       myRedFlagRecords,
       loading,
-      errorMessage
+      errorMessages
     } = mockProps;
     const mockStore = {
       auth: {
@@ -131,7 +131,7 @@ describe("Profile Page component", () => {
         myRedFlagRecords,
         myInterventionRecords,
         loading,
-        errorMessage
+        errorMessages
       }
     };
     const mockDispatch = action => `Mocked Dispatch of ${action}`;
@@ -143,7 +143,7 @@ describe("Profile Page component", () => {
     expect(myRecordsPageProps.isAdmin).toEqual(isAdmin);
     expect(myRecordsPageProps.token).toEqual(token);
     expect(myRecordsPageProps.loading).toEqual(loading);
-    expect(myRecordsPageProps.errorMessage).toEqual(errorMessage);
+    expect(myRecordsPageProps.errorMessages).toEqual(errorMessages);
     expect(myRecordsPageProps.myInterventionRecords).toEqual(
       myInterventionRecords
     );
