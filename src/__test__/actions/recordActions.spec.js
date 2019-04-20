@@ -11,7 +11,9 @@ import {
   resetDeletedRecordAction,
   editRecordAction,
   resetEditRecordMessage,
-  getAllRecords
+  getAllRecords,
+  updateRecordAction,
+  resetUpdatedRecordAction
 } from "../../actions/recordActions";
 import mockStore from "../../__mocks__/storeMock";
 import {
@@ -30,7 +32,10 @@ import {
   EDITED_RECORD,
   GOT_RECORD_FOR_EDIT,
   ERROR_EDITING_RECORD,
-  GOT_ALL_RECORDS
+  GOT_ALL_RECORDS,
+  UPDATED_RECORD,
+  ERROR_UPDATING_RECORD,
+  RESET_UPDATED_RECORD
 } from "../../actionTypes";
 
 describe("Get my records action creator", () => {
@@ -440,8 +445,8 @@ describe("Delete record action creator", () => {
     };
 
     moxios.wait(() => {
-      const getRecordRequest = moxios.requests.mostRecent();
-      getRecordRequest.respondWith(mockResponse);
+      const deleteRecordRequest = moxios.requests.mostRecent();
+      deleteRecordRequest.respondWith(mockResponse);
     });
 
     await store.dispatch(deleteRecordAction(mockToken, mockRecordInfo));
@@ -464,8 +469,8 @@ describe("Delete record action creator", () => {
     };
 
     moxios.wait(() => {
-      const getRecordRequest = moxios.requests.mostRecent();
-      getRecordRequest.respondWith(mockResponse);
+      const deleteRecordRequest = moxios.requests.mostRecent();
+      deleteRecordRequest.respondWith(mockResponse);
     });
 
     await store.dispatch(deleteRecordAction(mockToken, mockRecordInfo));
@@ -485,8 +490,8 @@ describe("Delete record action creator", () => {
     };
 
     moxios.wait(() => {
-      const getRecordRequest = moxios.requests.mostRecent();
-      getRecordRequest.respondWith(mockResponse);
+      const deleteRecordRequest = moxios.requests.mostRecent();
+      deleteRecordRequest.respondWith(mockResponse);
     });
 
     await store.dispatch(deleteRecordAction(mockToken, mockRecordInfo));
@@ -567,8 +572,8 @@ describe("Edit record action creator", () => {
     };
 
     moxios.wait(() => {
-      const getRecordRequest = moxios.requests.mostRecent();
-      getRecordRequest.respondWith(mockResponse);
+      const editRecordRequest = moxios.requests.mostRecent();
+      editRecordRequest.respondWith(mockResponse);
     });
 
     await store.dispatch(editRecordAction(mockToken, mockDetails));
@@ -596,8 +601,8 @@ describe("Edit record action creator", () => {
     };
 
     moxios.wait(() => {
-      const getRecordRequest = moxios.requests.mostRecent();
-      getRecordRequest.respondWith(mockResponse);
+      const editRecordRequest = moxios.requests.mostRecent();
+      editRecordRequest.respondWith(mockResponse);
     });
 
     await store.dispatch(editRecordAction(mockToken, mockDetails));
@@ -623,8 +628,8 @@ describe("Edit record action creator", () => {
     };
 
     moxios.wait(() => {
-      const getRecordRequest = moxios.requests.mostRecent();
-      getRecordRequest.respondWith(mockResponse);
+      const editRecordRequest = moxios.requests.mostRecent();
+      editRecordRequest.respondWith(mockResponse);
     });
 
     await store.dispatch(editRecordAction(mockToken, mockDetails));
@@ -650,8 +655,8 @@ describe("Edit record action creator", () => {
     };
 
     moxios.wait(() => {
-      const getRecordRequest = moxios.requests.mostRecent();
-      getRecordRequest.respondWith(mockResponse);
+      const editRecordRequest = moxios.requests.mostRecent();
+      editRecordRequest.respondWith(mockResponse);
     });
 
     await store.dispatch(editRecordAction(mockToken, mockDetails));
@@ -675,8 +680,8 @@ describe("Edit record action creator", () => {
     };
 
     moxios.wait(() => {
-      const getRecordRequest = moxios.requests.mostRecent();
-      getRecordRequest.respondWith(mockResponse);
+      const editRecordRequest = moxios.requests.mostRecent();
+      editRecordRequest.respondWith(mockResponse);
     });
 
     await store.dispatch(editRecordAction(mockToken, mockDetails));
@@ -823,5 +828,107 @@ describe("Get all records action creator", () => {
       }
     ]);
     done();
+  });
+});
+
+describe("Update record action creator", () => {
+  jest.setTimeout(30000);
+  beforeEach(() => {
+    moxios.install(axios);
+  });
+
+  afterEach(() => {
+    moxios.uninstall(axios);
+  });
+
+  it("dispatches the UPDATED_RECORD action when comment was updated successfully", async done => {
+    const store = mockStore({});
+    const mockDetails = {
+      type: "intervention",
+      adminStatus: "resolved",
+      adminFeedback: "Worked on It",
+      id: 11
+    };
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: [{ message: "Updated record to resolved" }]
+      }
+    };
+
+    moxios.wait(() => {
+      const updatedRecordRequest = moxios.requests.mostRecent();
+      updatedRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(updateRecordAction(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, UPDATED_RECORD]);
+    done();
+  });
+  it("dispatches the ERROR_UPDATED_RECORD action when there is a user error updating the record", async done => {
+    const store = mockStore({});
+    const mockDetails = {
+      type: "intervention",
+      adminStatus: "resolved",
+      adminFeedback: "Worked on It",
+      id: 11
+    };
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 403,
+        error: "Forbidden"
+      }
+    };
+
+    moxios.wait(() => {
+      const updateRecordRequest = moxios.requests.mostRecent();
+      updateRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(updateRecordAction(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_UPDATING_RECORD]);
+    done();
+  });
+
+  it("dispatches the ERROR_UPDATING_RECORD action when there is a server error when updating the record", async done => {
+    const store = mockStore({});
+    const mockDetails = {
+      type: "intervention",
+      adminStatus: "resolved",
+      adminFeedback: "Worked on It",
+      id: 11
+    };
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 500,
+      response: {}
+    };
+
+    moxios.wait(() => {
+      const updateRecordRequest = moxios.requests.mostRecent();
+      updateRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(updateRecordAction(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_UPDATING_RECORD]);
+    done();
+  });
+});
+
+describe("Reset updated record action creator", () => {
+  it("returns the RESET_UPDATED_RECORD action", () => {
+    expect(resetUpdatedRecordAction()).toEqual({
+      type: RESET_UPDATED_RECORD
+    });
   });
 });

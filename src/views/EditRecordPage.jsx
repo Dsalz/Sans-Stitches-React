@@ -178,7 +178,13 @@ export const EditRecordPage = ({
 
   const currLocation = recordFetchedForEdit.location;
 
-  if (!location && !value && currLocation && !locationEditted) {
+  if (
+    !location &&
+    !value &&
+    currLocation &&
+    !locationEditted &&
+    process.env.NODE_ENV !== "test"
+  ) {
     const currLat = currLocation.split(" , ")[0];
     const currLng = currLocation.split(" , ")[1];
     ReactGeocode.fromLatLng(currLat, currLng).then(resp => {

@@ -29,7 +29,9 @@ import {
   fetchRecordAction,
   clearRecordErrors,
   resetDeletedRecordAction,
-  deleteRecordAction
+  deleteRecordAction,
+  updateRecordAction,
+  resetUpdatedRecordAction
 } from "../actions/recordActions";
 
 import { baseURL } from "../actions/customAxios";
@@ -55,17 +57,23 @@ export const RecordDetailsPage = ({
   resetDeletedRecord,
   deleteRecord,
   recordDeleted,
-  history
+  history,
+  updateRecord,
+  resetUpdatedRecord,
+  updateRecordMessage
 }) => {
   [state, setState] = useState({
     fetchedRecord: false,
     showDeleteModal: false,
-    resetDeletedStatus: false
+    resetDeletedStatus: false,
+    resetUpdatedStatus: false,
+    adminStatus: null,
+    adminFeedback: null
   });
 
-  const { fetchedRecord, resetDeletedStatus } = state;
+  const { fetchedRecord, resetDeletedStatus, resetUpdatedStatus } = state;
+  const { recordInfo } = match.params;
   if (!fetchedRecord) {
-    const { recordInfo } = match.params;
     fetchRecord(recordInfo);
     setState({
       ...state,
@@ -81,8 +89,15 @@ export const RecordDetailsPage = ({
     });
   }
 
+  if (!resetUpdatedStatus) {
+    resetUpdatedRecord();
+    setState({
+      ...state,
+      resetUpdatedStatus: true
+    });
+  }
+
   const handleDeleteRecord = () => {
-    const { recordInfo } = match.params;
     deleteRecord(token, recordInfo);
   };
 
@@ -92,6 +107,21 @@ export const RecordDetailsPage = ({
       ...state,
       showDeleteModal: !showDeleteModal
     });
+  };
+
+  const handleChange = e => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    const { id, type } = recordFetched;
+    state.id = id;
+    state.type = type;
+    updateRecord(token, state);
   };
 
   const {
@@ -111,7 +141,14 @@ export const RecordDetailsPage = ({
     longitude = Number(location.split(" , ")[1]);
   }
 
-  const { showDeleteModal } = state;
+  const { showDeleteModal, adminStatus, adminFeedback } = state;
+  const currStatus = adminStatus !== null ? adminStatus : status;
+  let currFeedback = "";
+
+  if (feedback !== "No Feedback") {
+    currFeedback = adminFeedback !== null ? adminFeedback : feedback;
+  }
+
   return (
     <div className={`${token ? "blue-bg dashboard-body" : "blk-rd-gradient"}`}>
       {recordDeleted && !errorMessages.length && (
@@ -127,6 +164,15 @@ export const RecordDetailsPage = ({
           modalHeader="Error"
           modalText={errorMessages[0].error}
           onClose={clearErrors}
+        />
+      )}
+      {updateRecordMessage && (
+        <Modal
+          modalHeader="Success"
+          modalText={updateRecordMessage}
+          onClose={() => {
+            document.location.assign(`/record/${recordInfo}`);
+          }}
         />
       )}
       {showDeleteModal && !errorMessages.length && !recordDeleted && (
@@ -161,6 +207,12 @@ export const RecordDetailsPage = ({
         <Fragment>
           <AppDashboardNavbar />
           <AppDashboardSideBar />
+        </Fragment>
+      )}
+      {token && isAdmin && (
+        <Fragment>
+          <AppDashboardNavbar />
+          <AppDashboardSideBar admin />
         </Fragment>
       )}
       {!token && <IndexNavbar />}
@@ -274,41 +326,46 @@ export const RecordDetailsPage = ({
               <p id="location" />
             </div>
 
-            <div className="record-details-section-item">
-              <h3 className="record-details-section-item-header">Feedback</h3>
-              <hr className="record-details-section-line" />
-              <div className="record-details-section-item-data">
-                <p id="feedback">
-                  {feedback || "No feedback given for this record"}
-                </p>
+            {!isAdmin && (
+              <div className="record-details-section-item">
+                <h3 className="record-details-section-item-header">Feedback</h3>
+                <hr className="record-details-section-line" />
+                <div className="record-details-section-item-data">
+                  <p id="feedback">
+                    {feedback || "No feedback given for this record"}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
             {isAdmin && (
-              <form id="edit-status-form">
+              <form id="edit-status-form" onSubmit={handleSubmit}>
                 <div className="dashboard-form-item">
                   <label className="dashboard-form-item-label">Status:</label>
 
                   <div className="dashboard-form-item-whole sev-rows">
                     <div className="one-row">
                       <input
-                        name="status"
-                        id="pending"
+                        name="adminStatus"
+                        id="pending-review"
                         type="radio"
                         className="form-radio-btn"
                         value="pending review"
-                        checked
+                        onChange={handleChange}
+                        checked={currStatus === "pending review"}
                       />
                       <label htmlFor="pending">Pending Review</label>
                     </div>
 
                     <div className="one-row">
                       <input
-                        name="status"
+                        name="adminStatus"
                         id="under-investigation"
                         type="radio"
                         className="form-radio-btn"
                         value="under investigation"
+                        onChange={handleChange}
+                        checked={currStatus === "under investigation"}
                       />
                       <label htmlFor="under-investigation">
                         Under Investigation
@@ -317,22 +374,26 @@ export const RecordDetailsPage = ({
 
                     <div className="one-row">
                       <input
-                        name="status"
+                        name="adminStatus"
                         id="resolved"
                         type="radio"
                         className="form-radio-btn"
                         value="resolved"
+                        onChange={handleChange}
+                        checked={currStatus === "resolved"}
                       />
                       <label htmlFor="resolved">Resolved</label>
                     </div>
 
                     <div className="one-row">
                       <input
-                        name="status"
+                        name="adminStatus"
                         id="rejected"
                         type="radio"
                         className="form-radio-btn"
                         value="rejected"
+                        onChange={handleChange}
+                        checked={currStatus === "rejected"}
                       />
                       <label htmlFor="rejected">Rejected</label>
                     </div>
@@ -348,7 +409,13 @@ export const RecordDetailsPage = ({
                   </label>
 
                   <div className="dashboard-form-item-whole">
-                    <textarea id="feedback" className="form-text-area" />
+                    <textarea
+                      name="adminFeedback"
+                      id="feedback"
+                      className="form-text-area"
+                      value={currFeedback}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
 
@@ -387,7 +454,13 @@ export const RecordDetailsPage = ({
 };
 
 export const mapStateToProps = ({ auth, records, user }) => {
-  const { loading, errorMessages, recordFetched, recordDeleted } = records;
+  const {
+    loading,
+    errorMessages,
+    recordFetched,
+    recordDeleted,
+    updateRecordMessage
+  } = records;
   const { token } = auth;
   return {
     token,
@@ -396,21 +469,37 @@ export const mapStateToProps = ({ auth, records, user }) => {
     isAdmin: user.user.is_admin,
     userId: user.user.id,
     recordFetched,
-    recordDeleted
+    recordDeleted,
+    updateRecordMessage
   };
 };
 
 export const mapDispatchToProps = dispatch => {
   return {
     fetchRecord: recordInfo => dispatch(fetchRecordAction(recordInfo)),
+    updateRecord: (token, details) =>
+      dispatch(updateRecordAction(token, details)),
     clearErrors: () => dispatch(clearRecordErrors()),
     resetDeletedRecord: () => dispatch(resetDeletedRecordAction()),
+    resetUpdatedRecord: () => dispatch(resetUpdatedRecordAction()),
     deleteRecord: (token, recordInfo) =>
       dispatch(deleteRecordAction(token, recordInfo))
   };
 };
 
 RecordDetailsPage.propTypes = {
+  /**
+   * Message returned when admin updates record
+   */
+  updateRecordMessage: string,
+  /**
+   * Function for resetting updated record message
+   */
+  resetUpdatedRecord: func.isRequired,
+  /**
+   * Function for updating record's status
+   */
+  updateRecord: func.isRequired,
   /**
    * Function for resetting deleted record state in the store to false
    */
@@ -420,7 +509,7 @@ RecordDetailsPage.propTypes = {
    */
   deleteRecord: func.isRequired,
   /**
-   * Booleanvalue depicting if a record has recently been deleted
+   * Boolean value depicting if a record has recently been deleted
    */
   recordDeleted: bool.isRequired,
   /**
@@ -444,7 +533,7 @@ RecordDetailsPage.propTypes = {
    */
   loading: bool.isRequired,
   /**
-   * Error messages that may arise from fetching record
+   * Error messages that may arise from fetching, deleting or updating record
    */
   errorMessages: arrayOf(object),
   /**
@@ -470,7 +559,8 @@ RecordDetailsPage.defaultProps = {
   isAdmin: false,
   token: "",
   recordFetched: {},
-  userId: -1
+  userId: -1,
+  updateRecordMessage: ""
 };
 
 export default connect(

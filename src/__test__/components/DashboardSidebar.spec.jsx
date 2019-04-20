@@ -24,4 +24,19 @@ describe("Dashboard Sidebar component", () => {
     ).toContain("responsive-sidebar");
     expect(state.showResponsiveSidebar).toEqual(true);
   });
+  it("should render the admin links when admin is set to true", () => {
+    const adminDashboardSidebar = shallow(<DashboardSidebar admin />);
+    expect(
+      adminDashboardSidebar
+        .find("NavLink")
+        .first()
+        .prop("to")
+    ).toEqual("/admin-overview");
+    expect(
+      adminDashboardSidebar
+        .find("NavLink")
+        .last()
+        .prop("to")
+    ).toEqual("/all-records");
+  });
 });

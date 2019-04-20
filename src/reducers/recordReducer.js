@@ -15,7 +15,10 @@ import {
   RESET_EDITED_RECORD,
   ERROR_EDITING_RECORD,
   EDITED_RECORD,
-  GOT_ALL_RECORDS
+  GOT_ALL_RECORDS,
+  RESET_UPDATED_RECORD,
+  UPDATED_RECORD,
+  ERROR_UPDATING_RECORD
 } from "../actionTypes";
 
 /* eslint-disable indent */
@@ -28,6 +31,7 @@ const initialState = {
   errorMessages: [],
   createdRecordMessage: "",
   editRecordMessage: "",
+  updateRecordMessage: "",
   recordFetched: {},
   recordFetchedForEdit: {},
   recordDeleted: false
@@ -177,6 +181,32 @@ const recordReducer = (state = initialState, { type, payload }) => {
         allRedFlagRecords: payload.redFlagRecords,
         allInterventionRecords: payload.interventionRecords,
         loading: false,
+        errorMessages: []
+      };
+    case RESET_UPDATED_RECORD:
+      return {
+        ...state,
+        updateRecordMessage: "",
+        errorMessages: []
+      };
+    case ERROR_UPDATING_RECORD:
+      return {
+        ...state,
+        loading: false,
+        errorMessages: [
+          {
+            error:
+              payload ||
+              "Error updating record, please check your connection and try again later"
+          }
+        ],
+        updateRecordMessage: ""
+      };
+    case UPDATED_RECORD:
+      return {
+        ...state,
+        loading: false,
+        updateRecordMessage: payload,
         errorMessages: []
       };
     default:
