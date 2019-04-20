@@ -88,4 +88,17 @@ describe("Dashboard Navbar component", () => {
     expect(dashboardNavbarProps.logout()).toBeDefined();
     expect(dashboardNavbarProps.logout()).toContain("Mocked Dispatch of");
   });
+  it("should render admin as the user when the user is an admin", () => {
+    const adminDashboardNavbar = shallow(
+      <DashboardNavbar
+        isLoggedIn
+        isAdmin
+        firstname="george"
+        logout={mockLogoutFunction}
+      />
+    );
+    expect(
+      adminDashboardNavbar.find("p.dashboard-nav-dropdown-user").text()
+    ).toEqual("admin");
+  });
 });

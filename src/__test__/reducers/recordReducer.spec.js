@@ -16,7 +16,10 @@ import {
   GOT_RECORD_FOR_EDIT,
   EDITED_RECORD,
   RESET_EDITED_RECORD,
-  GOT_ALL_RECORDS
+  GOT_ALL_RECORDS,
+  RESET_UPDATED_RECORD,
+  UPDATED_RECORD,
+  ERROR_UPDATING_RECORD
 } from "../../actionTypes";
 
 describe("record reducer's initial state", () => {
@@ -274,5 +277,51 @@ describe("record reducer", () => {
     );
     expect(reducerState.loading).toEqual(false);
     expect(reducerState.errorMessages).toEqual([]);
+  });
+  it("should update state with success message UPDATED_RECORD action is dispatched", () => {
+    const mockSuccessMessage = "Record's status well and truly updated";
+    const reducerState = recordReducer(undefined, {
+      type: UPDATED_RECORD,
+      payload: mockSuccessMessage
+    });
+    expect(reducerState.updateRecordMessage).toEqual(mockSuccessMessage);
+    expect(reducerState.loading).toEqual(false);
+    expect(reducerState.errorMessages).toEqual([]);
+  });
+  it("should update error messages in the state when ERROR_UPDATING_RECORD action is dispatched and error is provided", () => {
+    const mockPayload = "Forbidden";
+    const reducerState = recordReducer(undefined, {
+      type: ERROR_UPDATING_RECORD,
+      payload: mockPayload
+    });
+    expect(reducerState.errorMessages).toEqual([{ error: mockPayload }]);
+    expect(reducerState.updateRecordMessage).toEqual("");
+    expect(reducerState.loading).toEqual(false);
+  });
+  it("should update error messages in the state when ERROR_UPDATING_RECORD action is dispatched and error is not provided", () => {
+    const reducerState = recordReducer(undefined, {
+      type: ERROR_UPDATING_RECORD
+    });
+    expect(reducerState.errorMessages).toEqual([
+      {
+        error:
+          "Error updating record, please check your connection and try again later"
+      }
+    ]);
+    expect(reducerState.updateRecordMessage).toEqual("");
+    expect(reducerState.loading).toEqual(false);
+  });
+  it("should reset update record message when RESET_UPDATED_RECORD action is dispatched", () => {
+    const initialReducerState = recordReducer(undefined, {
+      type: UPDATED_RECORD,
+      payload: "Record has been updated"
+    });
+    expect(initialReducerState.updateRecordMessage).toEqual(
+      "Record has been updated"
+    );
+    const reducerState = recordReducer(initialReducerState, {
+      type: RESET_UPDATED_RECORD
+    });
+    expect(reducerState.updateRecordMessage).toEqual("");
   });
 });

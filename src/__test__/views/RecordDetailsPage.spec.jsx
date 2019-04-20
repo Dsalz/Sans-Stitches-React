@@ -13,6 +13,9 @@ describe("Records Details Page component", () => {
   const mockDeleteRecord = jest.fn();
   const mockFetchRecord = jest.fn();
   const mockClearErrors = jest.fn();
+  const mockUpdateRecord = jest.fn();
+  const mockResetUpdatedRecord = jest.fn();
+
   const mockRecordFetched = {
     comment: "abc",
     type: "Red Flag",
@@ -39,10 +42,13 @@ describe("Records Details Page component", () => {
     userId: 14,
     errorMessages: [],
     isAdmin: false,
+    updateRecordMessage: "",
     clearErrors: mockClearErrors,
     fetchRecord: mockFetchRecord,
     resetDeletedRecord: mockResetDeletedRecord,
-    deleteRecord: mockDeleteRecord
+    deleteRecord: mockDeleteRecord,
+    resetUpdatedRecord: mockResetUpdatedRecord,
+    updateRecord: mockUpdateRecord
   };
   const recordDetailsPage = shallow(<RecordDetailsPage {...mockProps} />);
   it("renders the page with all the article's information", () => {
@@ -97,6 +103,52 @@ describe("Records Details Page component", () => {
     expect(
       nonCreatedRecordDetailsPage.find("div.edit-record-button-div").exists()
     ).toBe(false);
+  });
+
+  it("hides the form to update record when user is not an admin", () => {
+    expect(recordDetailsPage.find("form#edit-status-form").exists()).toBe(
+      false
+    );
+  });
+  it("renders fields to update the status and feedback if the user is an admin", () => {
+    const adminRecordDetailsPage = shallow(
+      <RecordDetailsPage {...{ ...mockProps, isAdmin: true }} />
+    );
+    expect(adminRecordDetailsPage.find("form#edit-status-form").exists()).toBe(
+      true
+    );
+    expect(adminRecordDetailsPage.find("input#pending-review").exists()).toBe(
+      true
+    );
+    expect(
+      adminRecordDetailsPage.find("input#under-investigation").exists()
+    ).toBe(true);
+    expect(adminRecordDetailsPage.find("input#resolved").exists()).toBe(true);
+    expect(adminRecordDetailsPage.find("input#rejected").exists()).toBe(true);
+    expect(adminRecordDetailsPage.find("textarea#feedback").exists()).toBe(
+      true
+    );
+
+    const mockInputEvent = {
+      target: {
+        name: "adminFeedback",
+        value: "Not enough Proof"
+      }
+    };
+
+    adminRecordDetailsPage
+      .find("textarea#feedback")
+      .simulate("change", mockInputEvent);
+    expect(getState().adminFeedback).toEqual(mockInputEvent.target.value);
+
+    const mockFormEvent = {
+      preventDefault: () => "Prevented Default"
+    };
+
+    adminRecordDetailsPage
+      .find("form#edit-status-form")
+      .simulate("submit", mockFormEvent);
+    expect(mockUpdateRecord.mock.calls.length).toEqual(1);
   });
   it("hides the edit and delete buttons only when the record is not pending review", () => {
     const nonPendingRecordDetailsPage = shallow(
@@ -173,18 +225,34 @@ describe("Records Details Page component", () => {
     );
   });
   it("shows the modal with the success message when the record has been deleted", () => {
-    const errorRecordDetailsPage = shallow(
+    const successRecordDetailsPage = shallow(
       <RecordDetailsPage {...{ ...mockProps, recordDeleted: true }} />
     );
-    expect(errorRecordDetailsPage.find("Modal").exists()).toBe(true);
-    expect(errorRecordDetailsPage.find("Modal").prop("modalHeader")).toEqual(
+    expect(successRecordDetailsPage.find("Modal").exists()).toBe(true);
+    expect(successRecordDetailsPage.find("Modal").prop("modalHeader")).toEqual(
       "Success"
     );
-    expect(errorRecordDetailsPage.find("Modal").prop("modalText")).toEqual(
+    expect(successRecordDetailsPage.find("Modal").prop("modalText")).toEqual(
       "You have successfully deleted this record"
     );
   });
-
+  it("shows the modal with the success message when the record has been updated successfully", () => {
+    const successRecordDetailsPage = shallow(
+      <RecordDetailsPage
+        {...{
+          ...mockProps,
+          updateRecordMessage: "Sucessfully updated record's status to rejected"
+        }}
+      />
+    );
+    expect(successRecordDetailsPage.find("Modal").exists()).toBe(true);
+    expect(successRecordDetailsPage.find("Modal").prop("modalHeader")).toEqual(
+      "Success"
+    );
+    expect(successRecordDetailsPage.find("Modal").prop("modalText")).toEqual(
+      "Sucessfully updated record's status to rejected"
+    );
+  });
   it("receives the right props from the store", () => {
     const {
       loading,
@@ -193,7 +261,8 @@ describe("Records Details Page component", () => {
       recordDeleted,
       token,
       isAdmin,
-      userId
+      userId,
+      updateRecordMessage
     } = mockProps;
     const mockStore = {
       auth: {
@@ -209,11 +278,13 @@ describe("Records Details Page component", () => {
         recordFetched,
         recordDeleted,
         loading,
-        errorMessages
+        errorMessages,
+        updateRecordMessage
       }
     };
     const mockToken = "absf";
     const mockRecordInfo = "redflag-1";
+    const mockDetails = {};
     const mockDispatch = action => `Mocked Dispatch of ${action}`;
     let recordDetailsProps = mapStateToProps(mockStore);
     recordDetailsProps = {
@@ -226,6 +297,7 @@ describe("Records Details Page component", () => {
     expect(recordDetailsProps.errorMessages).toEqual(errorMessages);
     expect(recordDetailsProps.recordDeleted).toEqual(recordDeleted);
     expect(recordDetailsProps.recordFetched).toEqual(recordFetched);
+    expect(recordDetailsProps.updateRecordMessage).toEqual(updateRecordMessage);
     expect(recordDetailsProps.fetchRecord(mockRecordInfo)).toBeDefined();
     expect(recordDetailsProps.fetchRecord(mockRecordInfo)).toContain(
       "Mocked Dispatch of"
@@ -236,11 +308,21 @@ describe("Records Details Page component", () => {
     expect(recordDetailsProps.resetDeletedRecord()).toContain(
       "Mocked Dispatch of"
     );
+    expect(recordDetailsProps.resetUpdatedRecord()).toBeDefined();
+    expect(recordDetailsProps.resetUpdatedRecord()).toContain(
+      "Mocked Dispatch of"
+    );
     expect(
       recordDetailsProps.deleteRecord(mockToken, mockRecordInfo)
     ).toBeDefined();
     expect(
       recordDetailsProps.deleteRecord(mockToken, mockRecordInfo)
     ).toContain("Mocked Dispatch of");
+    expect(
+      recordDetailsProps.updateRecord(mockToken, mockDetails)
+    ).toBeDefined();
+    expect(recordDetailsProps.updateRecord(mockToken, mockDetails)).toContain(
+      "Mocked Dispatch of"
+    );
   });
 });

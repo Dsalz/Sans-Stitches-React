@@ -16,7 +16,10 @@ import {
   RESET_EDITED_RECORD,
   EDITED_RECORD,
   ERROR_EDITING_RECORD,
-  GOT_ALL_RECORDS
+  GOT_ALL_RECORDS,
+  UPDATED_RECORD,
+  ERROR_UPDATING_RECORD,
+  RESET_UPDATED_RECORD
 } from "../actionTypes";
 
 /**
@@ -327,3 +330,58 @@ export const getAllRecords = token => {
     }
   };
 };
+
+/**
+ * @description Action creator for posting details provided by the admin to the update record endpoints
+ * @param {string} token The user's token
+ * @param {object} details The details provided by the admin
+ * @returns {function} dispatch function with the appropriate action
+ */
+export const updateRecordAction = (token, details) => {
+  const { adminStatus, adminFeedback, type, id } = details;
+  const updateInfo = {};
+  if (adminStatus) {
+    updateInfo.status = adminStatus;
+  }
+  if (adminFeedback) {
+    updateInfo.feedback = adminFeedback;
+  }
+  return async dispatch => {
+    dispatch({ type: RECORDS_LOADING });
+    try {
+      const typeEndpoint = type === "red-flag" ? "red-flags" : "interventions";
+      const response = await axios.patch(
+        `/${typeEndpoint}/${id}/status`,
+        { ...updateInfo },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      const { error, data } = response.data;
+
+      if (error) {
+        return dispatch({
+          type: ERROR_UPDATING_RECORD,
+          payload: `Unable to update record because: ${error}`
+        });
+      }
+
+      return dispatch({
+        type: UPDATED_RECORD,
+        payload: data[0].message
+      });
+    } catch (err) {
+      return dispatch({
+        type: ERROR_UPDATING_RECORD,
+        payload: "Unable to update record, please try again later"
+      });
+    }
+  };
+};
+
+/**
+ * @description Action creator for resetting updated record status
+ * @returns {function} dispatch function with the appropriate action
+ */
+export const resetUpdatedRecordAction = () => ({ type: RESET_UPDATED_RECORD });
