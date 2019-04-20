@@ -17,7 +17,7 @@ let state, setState;
 
 export const getState = () => state;
 
-export const AdminAllRecordsPage = ({
+export const AdminPendingRecordsPage = ({
   allRedFlagRecords,
   allInterventionRecords,
   fetchAllRecords,
@@ -29,8 +29,7 @@ export const AdminAllRecordsPage = ({
   history
 }) => {
   [state, setState] = useState({
-    updatedRecords: false,
-    filterOption: "All"
+    updatedRecords: false
   });
 
   const { updatedRecords } = state;
@@ -42,31 +41,10 @@ export const AdminAllRecordsPage = ({
     });
   }
 
-  const toggleFilter = e => {
-    setState({
-      ...state,
-      filterOption: e.target.value
-    });
-  };
-
   const totalUserRecords = [...allRedFlagRecords, ...allInterventionRecords];
-
-  const { filterOption } = state;
-  const filterRecords = () => {
-    switch (filterOption) {
-      case "Pending":
-        return totalUserRecords.filter(r => r.status === "pending review");
-      case "Under-Investigation":
-        return totalUserRecords.filter(r => r.status === "under investigation");
-      case "Resolved":
-        return totalUserRecords.filter(r => r.status === "resolved");
-      case "Rejected":
-        return totalUserRecords.filter(r => r.status === "rejected");
-      default:
-        return totalUserRecords;
-    }
-  };
-  const recordsToDisplay = filterRecords();
+  const recordsToDisplay = totalUserRecords.filter(
+    r => r.status === "pending review"
+  );
 
   return (
     <div className="blue-bg dashboard-body">
@@ -90,20 +68,7 @@ export const AdminAllRecordsPage = ({
       <main className="dashboard-main">
         <section className="dashboard-card">
           <section className="dashboard-main-records-section">
-            <h2 className="dashboard-main-header red-cl">All Records</h2>
-
-            <select
-              defaultValue="All"
-              className="dashboard-select"
-              id="dashboard-table-select"
-              onChange={toggleFilter}
-            >
-              <option value="All">All</option>
-              <option value="Pending">Pending</option>
-              <option value="Under-Investigation">Under Investigation</option>
-              <option value="Resolved">Resolved</option>
-              <option value="Rejected">Rejected</option>
-            </select>
+            <h2 className="dashboard-main-header red-cl">Pending Records</h2>
             <AppTable
               data={recordsToDisplay.sort((a, b) => b.id - a.id)}
               allowEdit={false}
@@ -140,7 +105,7 @@ export const mapDispatchToProps = dispatch => {
   };
 };
 
-AdminAllRecordsPage.propTypes = {
+AdminPendingRecordsPage.propTypes = {
   /**
    * All red flag records created by user
    */
@@ -179,7 +144,7 @@ AdminAllRecordsPage.propTypes = {
   history: objectOf(object).isRequired
 };
 
-AdminAllRecordsPage.defaultProps = {
+AdminPendingRecordsPage.defaultProps = {
   errorMessages: [],
   isAdmin: false
 };
@@ -187,4 +152,4 @@ AdminAllRecordsPage.defaultProps = {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(AdminAllRecordsPage);
+)(AdminPendingRecordsPage);
