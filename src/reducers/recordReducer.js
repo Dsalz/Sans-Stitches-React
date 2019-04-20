@@ -14,13 +14,16 @@ import {
   GOT_RECORD_FOR_EDIT,
   RESET_EDITED_RECORD,
   ERROR_EDITING_RECORD,
-  EDITED_RECORD
+  EDITED_RECORD,
+  GOT_ALL_RECORDS
 } from "../actionTypes";
 
 /* eslint-disable indent */
 const initialState = {
   myRedFlagRecords: [],
   myInterventionRecords: [],
+  allRedFlagRecords: [],
+  allInterventionRecords: [],
   loading: false,
   errorMessages: [],
   createdRecordMessage: "",
@@ -166,6 +169,14 @@ const recordReducer = (state = initialState, { type, payload }) => {
         ...state,
         loading: false,
         editRecordMessage: payload,
+        errorMessages: []
+      };
+    case GOT_ALL_RECORDS:
+      return {
+        ...state,
+        allRedFlagRecords: payload.redFlagRecords,
+        allInterventionRecords: payload.interventionRecords,
+        loading: false,
         errorMessages: []
       };
     default:

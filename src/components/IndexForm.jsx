@@ -30,6 +30,7 @@ const IndexForm = ({
             onChange={field.onChange}
             errorMessage={field.errorMessage}
             isRequired={field.required}
+            inputValue={field.value}
           />
           <br />
         </Fragment>

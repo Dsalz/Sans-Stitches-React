@@ -9,7 +9,7 @@ import { logoutUserAction } from "../../actions/authActions";
 // eslint-disable-next-line import/no-mutable-exports
 export let state, setState;
 
-export const DashboardNavbar = ({ logout, isLoggedIn, firstname }) => {
+export const DashboardNavbar = ({ logout, isLoggedIn, firstname, isAdmin }) => {
   [state, setState] = useState({
     showDropdown: false
   });
@@ -40,7 +40,7 @@ export const DashboardNavbar = ({ logout, isLoggedIn, firstname }) => {
           onClick={toggleDropDown}
           role="presentation"
         >
-          {firstname}
+          {isAdmin ? "admin" : firstname}
         </p>
         <div
           className={`dashboard-nav-dropdown-options ${showDropdown &&
@@ -73,7 +73,15 @@ DashboardNavbar.propTypes = {
   /**
    * User's first name
    */
-  firstname: string.isRequired
+  firstname: string.isRequired,
+  /**
+   * User's admin status
+   */
+  isAdmin: bool
+};
+
+DashboardNavbar.defaultProps = {
+  isAdmin: false
 };
 
 export const mapStateToProps = ({ auth, user }) => {
@@ -81,7 +89,8 @@ export const mapStateToProps = ({ auth, user }) => {
   const { firstname } = user.user;
   return {
     isLoggedIn,
-    firstname
+    firstname,
+    isAdmin: user.user.is_admin
   };
 };
 

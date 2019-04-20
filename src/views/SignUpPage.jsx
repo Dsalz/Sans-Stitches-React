@@ -23,16 +23,35 @@ export const SignUpPage = ({
   clearErrors
 }) => {
   [state, setState] = useState({
-    fullname: "",
+    name: "",
     email: "",
     phoneNumber: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    errorCleared: false
   });
+
+  const {
+    name,
+    email,
+    phoneNumber,
+    password,
+    confirmPassword,
+    errorCleared
+  } = state;
+
+  if (!errorCleared) {
+    clearErrors();
+    setState({
+      ...state,
+      errorCleared: true
+    });
+  }
 
   let otherErrorMessage = "";
 
   const handleChange = e => {
+    clearErrors();
     setState({
       ...state,
       [e.target.name]: e.target.value
@@ -45,14 +64,16 @@ export const SignUpPage = ({
       placeholder: "Full Name",
       id: "name",
       onChange: handleChange,
-      required: true
+      required: true,
+      value: name
     },
     {
       name: "email",
       placeholder: "Email",
       id: "email",
       onChange: handleChange,
-      required: true
+      required: true,
+      value: email
     },
     {
       name: "phoneNumber",
@@ -60,7 +81,8 @@ export const SignUpPage = ({
       id: "phonenumber",
       onChange: handleChange,
       required: true,
-      type: "number"
+      type: "number",
+      value: phoneNumber
     },
     {
       name: "password",
@@ -68,7 +90,8 @@ export const SignUpPage = ({
       id: "password",
       onChange: handleChange,
       type: "password",
-      required: true
+      required: true,
+      value: password
     },
     {
       name: "confirmPassword",
@@ -76,7 +99,8 @@ export const SignUpPage = ({
       id: "confirmpassword",
       onChange: handleChange,
       type: "password",
-      required: true
+      required: true,
+      value: confirmPassword
     }
   ];
 

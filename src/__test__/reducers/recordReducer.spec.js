@@ -15,7 +15,8 @@ import {
   ERROR_EDITING_RECORD,
   GOT_RECORD_FOR_EDIT,
   EDITED_RECORD,
-  RESET_EDITED_RECORD
+  RESET_EDITED_RECORD,
+  GOT_ALL_RECORDS
 } from "../../actionTypes";
 
 describe("record reducer's initial state", () => {
@@ -251,5 +252,27 @@ describe("record reducer", () => {
     ]);
     expect(reducerState.editRecordMessage).toEqual("");
     expect(reducerState.loading).toEqual(false);
+  });
+  it("should store records when GOT_ALL_RECORDS is dispatched", () => {
+    const mockPayload = {
+      redFlagRecords: [
+        { id: 1, title: "huge red flag" },
+        { id: 2, title: "huge red flag" }
+      ],
+      interventionRecords: [
+        { id: 1, title: "huge red flag" },
+        { id: 2, title: "huge red flag" }
+      ]
+    };
+    const reducerState = recordReducer(undefined, {
+      type: GOT_ALL_RECORDS,
+      payload: mockPayload
+    });
+    expect(reducerState.allRedFlagRecords).toEqual(mockPayload.redFlagRecords);
+    expect(reducerState.allInterventionRecords).toEqual(
+      mockPayload.interventionRecords
+    );
+    expect(reducerState.loading).toEqual(false);
+    expect(reducerState.errorMessages).toEqual([]);
   });
 });

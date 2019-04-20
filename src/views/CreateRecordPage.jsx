@@ -122,7 +122,16 @@ export const CreateRecordPage = ({
     e.preventDefault();
     createRecord(token, state);
   };
-  const { imagesSrc, location, value, latitude, longitude, type } = state;
+  const {
+    imagesSrc,
+    location,
+    value,
+    latitude,
+    longitude,
+    type,
+    comment,
+    video
+  } = state;
   return (
     <div className="blue-bg dashboard-body">
       {loading && <LoadingSVG />}
@@ -158,6 +167,7 @@ export const CreateRecordPage = ({
                     inputName="comment"
                     inputId="comment"
                     onChange={handleChange}
+                    inputValue={comment}
                     isRequired
                   />
                 </div>
@@ -325,6 +335,7 @@ export const CreateRecordPage = ({
                     inputName="video"
                     inputId="video"
                     onChange={handleChange}
+                    inputValue={video}
                   />
                 </div>
               </div>
