@@ -23,12 +23,24 @@ export const LoginPage = ({
 }) => {
   [state, setState] = useState({
     email: "",
-    password: ""
+    password: "",
+    errorCleared: false
   });
 
   let otherErrorMessage = "";
 
+  const { email, password, errorCleared } = state;
+
+  if (!errorCleared) {
+    clearErrors();
+    setState({
+      ...state,
+      errorCleared: true
+    });
+  }
+
   const handleChange = e => {
+    clearErrors();
     setState({
       ...state,
       [e.target.name]: e.target.value
@@ -41,7 +53,8 @@ export const LoginPage = ({
       placeholder: "Email",
       id: "email",
       onChange: handleChange,
-      required: true
+      required: true,
+      value: email
     },
     {
       name: "password",
@@ -49,7 +62,8 @@ export const LoginPage = ({
       id: "password",
       onChange: handleChange,
       type: "password",
-      required: true
+      required: true,
+      value: password
     }
   ];
 

@@ -109,6 +109,8 @@ describe("Login Page View", () => {
       }
     };
 
+    const mockDetails = {};
+
     const mockDispatch = action => `Mocked Dispatch of ${action}`;
     const loginProps = mapStateToProps(mockStore);
     const loginDispatchProps = mapDispatchToProps(mockDispatch);
@@ -117,8 +119,10 @@ describe("Login Page View", () => {
     expect(loginProps.errorMessages).toEqual([]);
     expect(loginDispatchProps.clearErrors()).toBeDefined();
     expect(loginDispatchProps.clearErrors()).toContain("Mocked Dispatch of");
-    expect(loginDispatchProps.logUserIn()).toBeDefined();
-    expect(loginDispatchProps.logUserIn()).toContain("Mocked Dispatch of");
+    expect(loginDispatchProps.logUserIn(mockDetails)).toBeDefined();
+    expect(loginDispatchProps.logUserIn(mockDetails)).toContain(
+      "Mocked Dispatch of"
+    );
   });
 
   it("displays all errors when they are present", () => {

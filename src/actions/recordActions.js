@@ -15,11 +15,12 @@ import {
   GOT_RECORD_FOR_EDIT,
   RESET_EDITED_RECORD,
   EDITED_RECORD,
-  ERROR_EDITING_RECORD
+  ERROR_EDITING_RECORD,
+  GOT_ALL_RECORDS
 } from "../actionTypes";
 
 /**
- * @description Action for posting details provided by the user to the login endpoint
+ * @description Action creator for getting user's records
  * @param {string} token The user's token
  * @returns {function} dispatch function with the appropriate action
  */
@@ -54,13 +55,13 @@ export const getMyRecords = token => {
 };
 
 /**
- * @description Action for clearing record errors
+ * @description Action creator for clearing record errors
  * @returns {object} action
  */
 export const clearRecordErrors = () => ({ type: CLEAR_RECORD_ERRORS });
 
 /**
- * @description Action for posting details provided by the user to the create record endpoint
+ * @description Action creator for posting details provided by the user to the create record endpoint
  * @param {string} token The user's token
  * @param {object} details The details provided by the user
  * @returns {function} dispatch function with the appropriate action
@@ -134,20 +135,20 @@ export const createNewRecord = (token, details) => {
 };
 
 /**
- * @description Action for resetting created record status
+ * @description Action creator for resetting created record status
  * @returns {object} dispatch function with the appropriate action
  */
 export const resetCreateRecordMessage = () => ({ type: RESET_CREATED_RECORD });
 
 /**
- * @description Action for resetting edited record status
+ * @description Action creator for resetting edited record status
  * @returns {object} dispatch function with the appropriate action
  */
 export const resetEditRecordMessage = () => ({ type: RESET_EDITED_RECORD });
 
 /**
- * @description Action for fetching record details
- * @param {object} recordInfo The id and type of the record
+ * @description Action creator for fetching record details
+ * @param {string} recordInfo The id and type of the record
  * @param {object} forEdit boolean specifying if record is being fetched to be edited
  * @returns {function} dispatch function with the appropriate action
  */
@@ -179,9 +180,9 @@ export const fetchRecordAction = (recordInfo, forEdit = false) => {
 };
 
 /**
- * @description Action for deleting record details
+ * @description Action creator for deleting record details
  * @param {object} token The user's token
- * @param {object} recordInfo The id and type of the record
+ * @param {string} recordInfo The id and type of the record
  * @returns {function} dispatch function with the appropriate action
  */
 export const deleteRecordAction = (token, recordInfo) => {
@@ -213,13 +214,13 @@ export const deleteRecordAction = (token, recordInfo) => {
 };
 
 /**
- * @description Action for resetting created record status
+ * @description Action creator for resetting deleted record status
  * @returns {function} dispatch function with the appropriate action
  */
 export const resetDeletedRecordAction = () => ({ type: RESET_DELETED_RECORD });
 
 /**
- * @description Action for posting details provided by the user to the edit record endpoints
+ * @description Action creator for posting details provided by the user to the edit record endpoints
  * @param {string} token The user's token
  * @param {object} details The details provided by the user
  * @returns {function} dispatch function with the appropriate action
@@ -288,6 +289,41 @@ export const editRecordAction = (token, details) => {
         type: ERROR_EDITING_RECORD,
         payload: "Unable to update part of your record, please try again later"
       });
+    }
+  };
+};
+
+/**
+ * @description Action creator for gettong all records on the platform
+ * @param {string} token The user's token
+ * @returns {function} dispatch function with the appropriate action
+ */
+export const getAllRecords = token => {
+  return async dispatch => {
+    dispatch({ type: RECORDS_LOADING });
+    try {
+      const redFlagResponse = await axios.get("/red-flags", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const interventionResponse = await axios.get("/interventions", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (
+        redFlagResponse.data.status !== 200 ||
+        interventionResponse.data.status !== 200
+      ) {
+        dispatch({ type: ERROR_GETTING_RECORDS });
+        return;
+      }
+      dispatch({
+        type: GOT_ALL_RECORDS,
+        payload: {
+          redFlagRecords: redFlagResponse.data.data,
+          interventionRecords: interventionResponse.data.data
+        }
+      });
+    } catch (err) {
+      dispatch({ type: ERROR_GETTING_RECORDS });
     }
   };
 };

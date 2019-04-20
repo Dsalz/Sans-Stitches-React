@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import { NavLink } from "react-router-dom";
+import { bool } from "prop-types";
 
 // eslint-disable-next-line import/no-mutable-exports
 export let state, setState;
-const DashboardSidebar = () => {
+const DashboardSidebar = ({ admin }) => {
   [state, setState] = useState({
     showResponsiveSidebar: false
   });
@@ -32,17 +33,45 @@ const DashboardSidebar = () => {
         <hr />
         <hr />
       </div>
-      <NavLink className="dashboard-sidebar-item" to="/profile">
-        Profile
-      </NavLink>
-      <NavLink className="dashboard-sidebar-item" to="/myrecords">
-        My Records
-      </NavLink>
-      <NavLink className="dashboard-sidebar-item" to="/new-record">
-        Create New Record
-      </NavLink>
+      {!admin && (
+        <Fragment>
+          <NavLink className="dashboard-sidebar-item" to="/profile">
+            Profile
+          </NavLink>
+          <NavLink className="dashboard-sidebar-item" to="/myrecords">
+            My Records
+          </NavLink>
+          <NavLink className="dashboard-sidebar-item" to="/new-record">
+            Create New Record
+          </NavLink>
+        </Fragment>
+      )}
+      {admin && (
+        <Fragment>
+          <NavLink className="dashboard-sidebar-item" to="/admin-overview">
+            Overview
+          </NavLink>
+          <NavLink className="dashboard-sidebar-item" to="/pending-records">
+            Pending Records
+          </NavLink>
+          <NavLink className="dashboard-sidebar-item" to="/all-records">
+            All Records
+          </NavLink>
+        </Fragment>
+      )}
     </aside>
   );
+};
+
+DashboardSidebar.propTypes = {
+  /**
+   * Boolean field depicting whether to render the admin sidebar
+   */
+  admin: bool
+};
+
+DashboardSidebar.defaultProps = {
+  admin: false
 };
 
 export default DashboardSidebar;

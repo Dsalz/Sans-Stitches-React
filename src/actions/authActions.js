@@ -10,15 +10,15 @@ import {
 } from "../actionTypes";
 
 /**
- * @description Action for posting details provided by the user to the login endpoint
+ * @description Action creator for posting details provided by the user to the login endpoint
  * @param {object} details details provided by the user
  * @returns {function} dispatch function with the appropriate action
  */
-export const loginUserAction = details => {
+export const loginUserAction = ({ email, password }) => {
   return async dispatch => {
     dispatch({ type: AUTH_LOADING });
     try {
-      const response = await axios.post("/auth/login", { ...details });
+      const response = await axios.post("/auth/login", { email, password });
       const { data } = response;
       const { status, error } = data;
       dispatch(
@@ -36,15 +36,27 @@ export const loginUserAction = details => {
 };
 
 /**
- * @description Action for posting details provided by the user to the sign up endpoint
+ * @description Action creator for posting details provided by the user to the sign up endpoint
  * @param {object} details details provided by the user
  * @returns {function} dispatch function with the appropriate action
  */
-export const signUpUserAction = details => {
+export const signUpUserAction = ({
+  name,
+  email,
+  phoneNumber,
+  password,
+  confirmPassword
+}) => {
   return async dispatch => {
     dispatch({ type: AUTH_LOADING });
     try {
-      const response = await axios.post("/auth/signup", { ...details });
+      const response = await axios.post("/auth/signup", {
+        name,
+        email,
+        phoneNumber,
+        password,
+        confirmPassword
+      });
       const { data } = response;
       const { status, error } = data;
       dispatch(
@@ -62,7 +74,7 @@ export const signUpUserAction = details => {
 };
 
 /**
- * @description Action for clearing errors displayed to the user
+ * @description Action creator for clearing errors displayed to the user
  * @returns {object} action
  */
 export const clearErrorsAction = () => {
@@ -72,7 +84,7 @@ export const clearErrorsAction = () => {
 };
 
 /**
- * @description Action for logging user's out
+ * @description Action creator for logging user's out
  * @returns {object} action
  */
 export const logoutUserAction = () => {

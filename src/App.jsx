@@ -19,6 +19,7 @@ import AppMyRecordsPage from "./views/MyRecordsPage";
 import AppCreateRecordsPage from "./views/CreateRecordPage";
 import AppRecordDetailPage from "./views/RecordDetailsPage";
 import AppEditRecordPage from "./views/EditRecordPage";
+import AppAdminOverviewPage from "./views/AdminOverviewPage";
 
 const App = () => {
   return (
@@ -40,6 +41,7 @@ const App = () => {
           path="/edit-record/:recordInfo"
           component={AppEditRecordPage}
         />
+        <Route exact path="/admin-overview" component={AppAdminOverviewPage} />
       </Switch>
     </BrowserRouter>
   );

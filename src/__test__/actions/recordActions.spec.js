@@ -10,7 +10,8 @@ import {
   deleteRecordAction,
   resetDeletedRecordAction,
   editRecordAction,
-  resetEditRecordMessage
+  resetEditRecordMessage,
+  getAllRecords
 } from "../../actions/recordActions";
 import mockStore from "../../__mocks__/storeMock";
 import {
@@ -28,7 +29,8 @@ import {
   RESET_EDITED_RECORD,
   EDITED_RECORD,
   GOT_RECORD_FOR_EDIT,
-  ERROR_EDITING_RECORD
+  ERROR_EDITING_RECORD,
+  GOT_ALL_RECORDS
 } from "../../actionTypes";
 
 describe("Get my records action creator", () => {
@@ -689,5 +691,137 @@ describe("Reset edited record action creator", () => {
     expect(resetEditRecordMessage()).toEqual({
       type: RESET_EDITED_RECORD
     });
+  });
+});
+
+describe("Get all records action creator", () => {
+  jest.setTimeout(30000);
+  beforeEach(() => {
+    moxios.install(axios);
+  });
+
+  afterEach(() => {
+    moxios.uninstall(axios);
+  });
+
+  it("dispatches GOT_ALL_RECORDS type action with the expected payload when records are fetched successfully", async done => {
+    const store = mockStore({});
+    const mockToken = "zxcv";
+    const mockRedFlagDetails = {
+      data: [
+        { id: 1, title: "Serious Red Flag Issue" },
+        { id: 2, title: "Serious Red Flag Issue" }
+      ]
+    };
+
+    const mockRedFlagResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: mockRedFlagDetails
+      }
+    };
+
+    const mockInterventionDetails = {
+      data: [
+        { id: 3, title: "Serious Intervention Issue" },
+        { id: 4, title: "Serious Intervention Issue" }
+      ]
+    };
+
+    const mockInterventionResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: mockInterventionDetails
+      }
+    };
+
+    moxios.wait(() => {
+      const redFlagRequest = moxios.requests.at(0);
+      redFlagRequest.respondWith(mockRedFlagResponse).then(() => {
+        moxios.wait(() => {
+          const interventionRequest = moxios.requests.at(1);
+          interventionRequest.respondWith(mockInterventionResponse);
+        });
+      });
+    });
+
+    await store.dispatch(getAllRecords(mockToken));
+    expect(store.getActions()).toEqual([
+      { type: RECORDS_LOADING },
+      {
+        type: GOT_ALL_RECORDS,
+        payload: {
+          redFlagRecords: mockRedFlagDetails,
+          interventionRecords: mockInterventionDetails
+        }
+      }
+    ]);
+    done();
+  });
+
+  it("dispatches ERROR_GETTING_RECORDS type action when attempt to fetch records is unsuccessful due to user error", async done => {
+    const store = mockStore({});
+    const mockToken = "zxcv";
+
+    const mockRedFlagResponse = {
+      status: 200,
+      response: {
+        status: 400
+      }
+    };
+
+    const mockInterventionResponse = {
+      status: 200,
+      response: {
+        status: 400
+      }
+    };
+
+    moxios.wait(() => {
+      const redFlagRequest = moxios.requests.at(0);
+      redFlagRequest.respondWith(mockRedFlagResponse).then(() => {
+        moxios.wait(() => {
+          const interventionRequest = moxios.requests.at(1);
+          interventionRequest.respondWith(mockInterventionResponse);
+        });
+      });
+    });
+
+    await store.dispatch(getAllRecords(mockToken));
+    expect(store.getActions()).toEqual([
+      { type: RECORDS_LOADING },
+      {
+        type: ERROR_GETTING_RECORDS
+      }
+    ]);
+    done();
+  });
+
+  it("dispatches ERROR_GETTING_RECORDS type action when attempt to fetch records is unsuccessful due to a non user error", async done => {
+    const store = mockStore({});
+    const mockToken = "zxcv";
+
+    const mockRedFlagResponse = {
+      status: 500,
+      response: {
+        status: 500
+      }
+    };
+
+    moxios.wait(() => {
+      const redFlagRequest = moxios.requests.at(0);
+      redFlagRequest.respondWith(mockRedFlagResponse);
+    });
+
+    await store.dispatch(getAllRecords(mockToken));
+    expect(store.getActions()).toEqual([
+      { type: RECORDS_LOADING },
+      {
+        type: ERROR_GETTING_RECORDS
+      }
+    ]);
+    done();
   });
 });
