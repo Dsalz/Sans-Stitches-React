@@ -11,7 +11,11 @@ import {
   GOT_RECORD,
   RECORD_DELETED,
   RESET_DELETED_RECORD,
-  ERROR_DELETING_RECORD
+  ERROR_DELETING_RECORD,
+  GOT_RECORD_FOR_EDIT,
+  RESET_EDITED_RECORD,
+  EDITED_RECORD,
+  ERROR_EDITING_RECORD
 } from "../actionTypes";
 
 /**
@@ -131,16 +135,23 @@ export const createNewRecord = (token, details) => {
 
 /**
  * @description Action for resetting created record status
- * @returns {function} dispatch function with the appropriate action
+ * @returns {object} dispatch function with the appropriate action
  */
 export const resetCreateRecordMessage = () => ({ type: RESET_CREATED_RECORD });
 
 /**
+ * @description Action for resetting edited record status
+ * @returns {object} dispatch function with the appropriate action
+ */
+export const resetEditRecordMessage = () => ({ type: RESET_EDITED_RECORD });
+
+/**
  * @description Action for fetching record details
  * @param {object} recordInfo The id and type of the record
+ * @param {object} forEdit boolean specifying if record is being fetched to be edited
  * @returns {function} dispatch function with the appropriate action
  */
-export const fetchRecordAction = recordInfo => {
+export const fetchRecordAction = (recordInfo, forEdit = false) => {
   return async dispatch => {
     const type =
       recordInfo.split("-")[0] === "redflag" ? "red-flags" : "interventions";
@@ -156,7 +167,7 @@ export const fetchRecordAction = recordInfo => {
         });
       }
       return dispatch({
-        type: GOT_RECORD,
+        type: forEdit ? GOT_RECORD_FOR_EDIT : GOT_RECORD,
         payload: data[0]
       });
     } catch (err) {
@@ -206,3 +217,77 @@ export const deleteRecordAction = (token, recordInfo) => {
  * @returns {function} dispatch function with the appropriate action
  */
 export const resetDeletedRecordAction = () => ({ type: RESET_DELETED_RECORD });
+
+/**
+ * @description Action for posting details provided by the user to the edit record endpoints
+ * @param {string} token The user's token
+ * @param {object} details The details provided by the user
+ * @returns {function} dispatch function with the appropriate action
+ */
+export const editRecordAction = (token, details) => {
+  const { comment, latitude, longitude, images, type } = details;
+  return async dispatch => {
+    dispatch({ type: RECORDS_LOADING });
+    try {
+      const typeEndpoint = type === "red-flag" ? "red-flags" : "interventions";
+      let commentResponse = { data: {} };
+      let locationResponse = { data: {} };
+      let imageResponse = { data: {} };
+      if (comment) {
+        commentResponse = await axios.patch(
+          `/${typeEndpoint}/${details.id}/comment`,
+          { comment },
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+      }
+      if (latitude && longitude) {
+        locationResponse = await axios.patch(
+          `/${typeEndpoint}/${details.id}/location`,
+          { latitude, longitude },
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+      }
+      if (images.length) {
+        const imgFormData = new FormData();
+        images.forEach((file, index) =>
+          imgFormData.append(`files[${index}]`, file)
+        );
+        imgFormData.append("enctype", "multipart/form-data");
+        imageResponse = await axios.patch(
+          `/${typeEndpoint}/${details.id}/addImages`,
+          imgFormData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+      }
+      const error =
+        commentResponse.data.error ||
+        locationResponse.data.error ||
+        imageResponse.data.error ||
+        "";
+      if (error) {
+        return dispatch({
+          type: ERROR_EDITING_RECORD,
+          payload: `Unable to update part of your record because: ${error}`
+        });
+      }
+
+      return dispatch({
+        type: EDITED_RECORD,
+        payload: "Record Successfully Updated"
+      });
+    } catch (err) {
+      return dispatch({
+        type: ERROR_EDITING_RECORD,
+        payload: "Unable to update part of your record, please try again later"
+      });
+    }
+  };
+};

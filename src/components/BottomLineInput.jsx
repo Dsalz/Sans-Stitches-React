@@ -13,7 +13,9 @@ const BottomLineInput = ({
   placeHolder,
   onChange,
   errorMessage,
-  isRequired
+  isRequired,
+  inputValue,
+  isDisabled
 }) => (
   <>
     <input
@@ -24,12 +26,18 @@ const BottomLineInput = ({
       type={inputType}
       onChange={onChange}
       required={isRequired}
+      value={inputValue}
+      disabled={isDisabled}
     />
     {errorMessage && <p className="form-error red-cl">{errorMessage}</p>}
   </>
 );
 
 BottomLineInput.propTypes = {
+  /**
+   * The input's value
+   */
+  inputValue: string,
   /**
    * The custom class containing extra styles for the input
    */
@@ -61,7 +69,11 @@ BottomLineInput.propTypes = {
   /**
    * if the input field is required or not
    */
-  isRequired: bool
+  isRequired: bool,
+  /**
+   * if the input field is disabled or not
+   */
+  isDisabled: bool
 };
 
 BottomLineInput.defaultProps = {
@@ -71,7 +83,9 @@ BottomLineInput.defaultProps = {
   inputType: "text",
   placeHolder: "",
   errorMessage: "",
-  isRequired: false
+  isRequired: false,
+  inputValue: "",
+  isDisabled: false
 };
 
 export default BottomLineInput;

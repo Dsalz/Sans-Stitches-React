@@ -10,7 +10,11 @@ import {
   ERROR_GETTING_RECORD,
   ERROR_DELETING_RECORD,
   RECORD_DELETED,
-  RESET_DELETED_RECORD
+  RESET_DELETED_RECORD,
+  GOT_RECORD_FOR_EDIT,
+  RESET_EDITED_RECORD,
+  ERROR_EDITING_RECORD,
+  EDITED_RECORD
 } from "../actionTypes";
 
 /* eslint-disable indent */
@@ -20,7 +24,9 @@ const initialState = {
   loading: false,
   errorMessages: [],
   createdRecordMessage: "",
+  editRecordMessage: "",
   recordFetched: {},
+  recordFetchedForEdit: {},
   recordDeleted: false
 };
 
@@ -126,6 +132,40 @@ const recordReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         recordDeleted: false,
+        errorMessages: []
+      };
+    case GOT_RECORD_FOR_EDIT:
+      return {
+        ...state,
+        loading: false,
+        recordFetchedForEdit: payload,
+        errorMessages: []
+      };
+    case RESET_EDITED_RECORD:
+      return {
+        ...state,
+        editRecordMessage: "",
+        errorMessages: [],
+        recordFetchedForEdit: {}
+      };
+    case ERROR_EDITING_RECORD:
+      return {
+        ...state,
+        loading: false,
+        errorMessages: [
+          {
+            error:
+              payload ||
+              "Error editing record, please check your connection and try again later"
+          }
+        ],
+        editRecordMessage: ""
+      };
+    case EDITED_RECORD:
+      return {
+        ...state,
+        loading: false,
+        editRecordMessage: payload,
         errorMessages: []
       };
     default:
