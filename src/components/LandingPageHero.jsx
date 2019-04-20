@@ -22,12 +22,6 @@ const IndexNavbar = () => {
         <Link to="/login" className="index-landing-login">
           Login
         </Link>
-        <div className="index-affirmation">
-          <p>We are not all talk</p>
-          <Link to="/index-records" className="index-landing-resolved-reports">
-            Here are some reports we resolved
-          </Link>
-        </div>
       </section>
     </main>
   );

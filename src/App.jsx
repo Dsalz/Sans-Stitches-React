@@ -21,6 +21,7 @@ import AppRecordDetailPage from "./views/RecordDetailsPage";
 import AppEditRecordPage from "./views/EditRecordPage";
 import AppAdminOverviewPage from "./views/AdminOverviewPage";
 import AppAdminAllRecordsPage from "./views/AdminAllRecordsPage";
+import AppAdminPendingRecordsPage from "./views/AdminPendingRecordsPage";
 
 const App = () => {
   return (
@@ -44,6 +45,11 @@ const App = () => {
         />
         <Route exact path="/admin-overview" component={AppAdminOverviewPage} />
         <Route exact path="/all-records" component={AppAdminAllRecordsPage} />
+        <Route
+          exact
+          path="/pending-records"
+          component={AppAdminPendingRecordsPage}
+        />
       </Switch>
     </BrowserRouter>
   );
