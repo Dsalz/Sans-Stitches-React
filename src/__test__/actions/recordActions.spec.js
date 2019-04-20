@@ -8,7 +8,9 @@ import {
   createNewRecord,
   fetchRecordAction,
   deleteRecordAction,
-  resetDeletedRecordAction
+  resetDeletedRecordAction,
+  editRecordAction,
+  resetEditRecordMessage
 } from "../../actions/recordActions";
 import mockStore from "../../__mocks__/storeMock";
 import {
@@ -22,7 +24,11 @@ import {
   ERROR_GETTING_RECORD,
   RECORD_DELETED,
   ERROR_DELETING_RECORD,
-  RESET_DELETED_RECORD
+  RESET_DELETED_RECORD,
+  RESET_EDITED_RECORD,
+  EDITED_RECORD,
+  GOT_RECORD_FOR_EDIT,
+  ERROR_EDITING_RECORD
 } from "../../actionTypes";
 
 describe("Get my records action creator", () => {
@@ -492,6 +498,196 @@ describe("Reset deleted record action creator", () => {
   it("returns the RESET_DELETED_RECORD action", () => {
     expect(resetDeletedRecordAction()).toEqual({
       type: RESET_DELETED_RECORD
+    });
+  });
+});
+
+describe("Get record for editing action creator", () => {
+  jest.setTimeout(30000);
+  beforeEach(() => {
+    moxios.install(axios);
+  });
+
+  afterEach(() => {
+    moxios.uninstall(axios);
+  });
+
+  it("dispatches GOT_RECORD_FOR_EDIT type when record was gotten successfully", async done => {
+    const store = mockStore({});
+    const mockRecordInfo = "redflag-11";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: [{ id: 11 }]
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(fetchRecordAction(mockRecordInfo, true));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, GOT_RECORD_FOR_EDIT]);
+    done();
+  });
+});
+
+describe("Edit record action creator", () => {
+  jest.setTimeout(30000);
+  beforeEach(() => {
+    moxios.install(axios);
+  });
+
+  afterEach(() => {
+    moxios.uninstall(axios);
+  });
+
+  it("dispatches the EDITED_RECORD action when comment is updated", async done => {
+    const store = mockStore({});
+    const mockDetails = {
+      type: "intervention",
+      comment: "jkb",
+      images: [],
+      id: 11
+    };
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: [{ id: 11 }]
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(editRecordAction(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, EDITED_RECORD]);
+    done();
+  });
+  it("dispatches the EDITED_RECORD action when location is updated", async done => {
+    const store = mockStore({});
+    const mockDetails = {
+      type: "intervention",
+      latitude: "22.33",
+      longitude: "-2.33",
+      images: [],
+      id: 11
+    };
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: [{ id: 11 }]
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(editRecordAction(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, EDITED_RECORD]);
+    done();
+  });
+  it("dispatches the EDITED_RECORD action when location is updated", async done => {
+    const store = mockStore({});
+    const mockDetails = {
+      type: "intervention",
+      images: ["blabla.jpg"],
+      id: 11
+    };
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 200,
+        data: [{ id: 11 }]
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(editRecordAction(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, EDITED_RECORD]);
+    done();
+  });
+  it("dispatches the ERROR_EDITING_RECORD action when there is a user error updating the record", async done => {
+    const store = mockStore({});
+    const mockDetails = {
+      type: "intervention",
+      images: ["blabla.jpg"],
+      id: 11
+    };
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 200,
+      response: {
+        status: 403,
+        error: "Forbidden"
+      }
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(editRecordAction(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_EDITING_RECORD]);
+    done();
+  });
+
+  it("dispatches the ERROR_EDITING_RECORD action when there is a server error when updating the record", async done => {
+    const store = mockStore({});
+    const mockDetails = {
+      type: "intervention",
+      images: ["blabla.jpg"],
+      id: 11
+    };
+    const mockToken = "abcd";
+
+    const mockResponse = {
+      status: 500,
+      response: {}
+    };
+
+    moxios.wait(() => {
+      const getRecordRequest = moxios.requests.mostRecent();
+      getRecordRequest.respondWith(mockResponse);
+    });
+
+    await store.dispatch(editRecordAction(mockToken, mockDetails));
+    const dispatchTypes = store.getActions().map(a => a.type);
+    expect(dispatchTypes).toEqual([RECORDS_LOADING, ERROR_EDITING_RECORD]);
+    done();
+  });
+});
+
+describe("Reset edited record action creator", () => {
+  it("returns the RESET_EDITED_RECORD action", () => {
+    expect(resetEditRecordMessage()).toEqual({
+      type: RESET_EDITED_RECORD
     });
   });
 });

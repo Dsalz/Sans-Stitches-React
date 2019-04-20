@@ -1,12 +1,22 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/label-has-for */
-import React, { useState, useRef } from "react";
+import React, { useState, Fragment, useRef } from "react";
 import { connect } from "react-redux";
-import { func, arrayOf, object, string, bool } from "prop-types";
+import {
+  func,
+  arrayOf,
+  object,
+  string,
+  bool,
+  number,
+  objectOf
+} from "prop-types";
 import { Redirect } from "react-router-dom";
 import ReactGoogleMapLoader from "react-google-maps-loader";
 import ReactGooglePlacesSuggest from "react-google-places-suggest";
 import dotenv from "dotenv";
+import ReactGeocode from "react-geocode";
 
 // Components
 import AppDashboardNavbar from "../components/Layout/DashboardNavbar";
@@ -17,10 +27,13 @@ import BottomLineInput from "../components/BottomLineInput";
 
 // Actions
 import {
-  createNewRecord,
   clearRecordErrors,
-  resetCreateRecordMessage
+  resetEditRecordMessage,
+  fetchRecordAction,
+  editRecordAction
 } from "../actions/recordActions";
+
+import { baseURL } from "../actions/customAxios";
 
 let state, setState;
 
@@ -30,16 +43,22 @@ dotenv.config();
 
 const API_KEY = process.env.GOOGLE_SECRET_KEY;
 
-export const CreateRecordPage = ({
+ReactGeocode.setApiKey(API_KEY);
+
+export const EditRecordPage = ({
   token,
-  createRecord,
+  editRecord,
+  match,
+  fetchRecord,
   loading,
   errorMessages,
   clearErrors,
   isAdmin,
   resetMessage,
   history,
-  createdRecordMessage
+  editRecordMessage,
+  recordFetchedForEdit,
+  userId
 }) => {
   if (isAdmin) {
     return <Redirect to="/admin-overview" />;
@@ -60,30 +79,50 @@ export const CreateRecordPage = ({
     comment: "",
     type: "Red Flag",
     description: "",
-    location: "",
     latitude: "",
     longitude: "",
     images: [],
     imagesSrc: [],
     video: "",
     value: "",
-    resetCreatedRecord: false
+    resetEditedRecord: false,
+    fetchedRecord: false,
+    commentEditted: false,
+    locationEditted: false,
+    imageEditted: false
   });
 
-  const { resetCreatedRecord } = state;
+  const {
+    fetchedRecord,
+    resetEditedRecord,
+    location,
+    locationEditted,
+    commentEditted,
+    imageEditted
+  } = state;
 
-  if (!resetCreatedRecord) {
+  if (!resetEditedRecord) {
     resetMessage();
     setState({
       ...state,
-      resetCreatedRecord: true
+      resetEditedRecord: true
+    });
+  }
+
+  const { recordInfo } = match.params;
+  if (!fetchedRecord) {
+    fetchRecord(recordInfo);
+    setState({
+      ...state,
+      fetchedRecord: true
     });
   }
 
   const handleChange = e => {
     setState({
       ...state,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
+      commentEditted: true
     });
   };
 
@@ -91,16 +130,8 @@ export const CreateRecordPage = ({
     setState({
       ...state,
       location: e.target.value,
-      value: e.target.value
-    });
-  };
-
-  const deleteImg = i => {
-    const { images, imagesSrc } = state;
-    setState({
-      ...state,
-      images: images.filter((img, index) => index !== i),
-      imagesSrc: imagesSrc.filter((img, index) => index !== i)
+      value: e.target.value,
+      locationEditted: true
     });
   };
 
@@ -112,20 +143,72 @@ export const CreateRecordPage = ({
       setState({
         ...state,
         imagesSrc: [...imagesSrc, evt.target.result],
-        images: [...images, inputField.files[0]]
+        images: [...images, inputField.files[0]],
+        imageEditted: true
       });
     };
     imgReader.readAsDataURL(inputField.files[0]);
   };
 
+  const deleteImg = i => {
+    const { images, imagesSrc } = state;
+    setState({
+      ...state,
+      images: images.filter((img, index) => index !== i),
+      imagesSrc: imagesSrc.filter((img, index) => index !== i)
+    });
+  };
+
   const handleSubmit = e => {
     e.preventDefault();
-    createRecord(token, state);
+    const { id, type } = recordFetchedForEdit;
+    state.id = id;
+    state.type = type;
+    editRecord(token, state);
   };
-  const { imagesSrc, location, value, latitude, longitude, type } = state;
+  const { imagesSrc, value, latitude, longitude } = state;
+  const {
+    comment,
+    type,
+    status,
+    description,
+    images,
+    videos
+  } = recordFetchedForEdit;
+
+  const currLocation = recordFetchedForEdit.location;
+
+  if (!location && !value && currLocation && !locationEditted) {
+    const currLat = currLocation.split(" , ")[0];
+    const currLng = currLocation.split(" , ")[1];
+    ReactGeocode.fromLatLng(currLat, currLng).then(resp => {
+      setState({
+        ...state,
+        value: resp.results[0].formatted_address
+      });
+    });
+  }
+
+  const recordEditted = locationEditted || imageEditted || commentEditted;
+
   return (
     <div className="blue-bg dashboard-body">
       {loading && <LoadingSVG />}
+      {status && status !== "pending review" && (
+        <Modal
+          modalHeader="Error"
+          modalText={"You can't edit a record that isn't pending review"}
+          onClose={() => history.push("/myrecords")}
+        />
+      )}
+      {recordFetchedForEdit.created_by &&
+        recordFetchedForEdit.created_by !== userId && (
+        <Modal
+          modalHeader="Error"
+          modalText={"You can't edit a record that you didn't create"}
+          onClose={() => history.push("/myrecords")}
+        />
+      )}
       {errorMessages.length && (
         <Modal
           modalHeader="Error"
@@ -133,21 +216,23 @@ export const CreateRecordPage = ({
           onClose={clearErrors}
         />
       )}
-      {createdRecordMessage && (
+      {editRecordMessage && (
         <Modal
           modalHeader="Success"
-          modalText={createdRecordMessage}
-          onClose={() => history.push("/myrecords")}
+          modalText={editRecordMessage}
+          onClose={() => {
+            document.location.assign(`/record/${recordInfo}`);
+          }}
         />
       )}
       <AppDashboardNavbar />
       <AppDashboardSideBar />
       <main className="dashboard-main">
         <section className="dashboard-card">
-          <section className="new-record-section">
-            <h2 className="dashboard-main-header red-cl">New Record</h2>
+          <section className="new-record-section edit-record-section">
+            <h2 className="dashboard-main-header red-cl">Edit Record</h2>
 
-            <form id="new-record-form" onSubmit={handleSubmit}>
+            <form id="edit-record-form" onSubmit={handleSubmit}>
               <div className="dashboard-form-item">
                 <label htmlFor="comment" className="dashboard-form-item-label">
                   Title:
@@ -159,6 +244,7 @@ export const CreateRecordPage = ({
                     inputId="comment"
                     onChange={handleChange}
                     isRequired
+                    inputValue={commentEditted ? state.comment : comment}
                   />
                 </div>
               </div>
@@ -175,7 +261,8 @@ export const CreateRecordPage = ({
                       className="form-radio-btn"
                       value="Red Flag"
                       onChange={handleChange}
-                      checked={type === "Red Flag"}
+                      checked={type === "red-flag"}
+                      disabled
                     />
                     <label htmlFor="red-flag">Red Flag</label>
                   </div>
@@ -188,7 +275,8 @@ export const CreateRecordPage = ({
                       className="form-radio-btn"
                       value="Intervention"
                       onChange={handleChange}
-                      checked={type === "Intervention"}
+                      checked={type === "intervention"}
+                      disabled
                     />
                     <label htmlFor="intervention">Intervention</label>
                   </div>
@@ -205,11 +293,12 @@ export const CreateRecordPage = ({
 
                 <div className="dashboard-form-item-whole">
                   <textarea
-                    placeholder="Enter extra information here"
                     id="description"
-                    className="form-text-area"
+                    className="form-text-area cant-update"
                     onChange={handleChange}
                     name="description"
+                    value={description || ""}
+                    disabled
                   />
                 </div>
               </div>
@@ -252,13 +341,27 @@ export const CreateRecordPage = ({
                       <div className="dashboard-form-item-split-item">
                         <label>Latitude</label>
                         <br />
-                        <span id="location-latitude">{latitude}</span>
+                        {latitude && (
+                          <span id="location-latitude">{latitude}</span>
+                        )}
+                        {!latitude && currLocation && (
+                          <span id="location-latitude">
+                            {currLocation.split(" , ")[0]}
+                          </span>
+                        )}
                       </div>
 
                       <div className="dashboard-form-item-split-item">
                         <label>Longitude</label>
                         <br />
-                        <span id="location-longitude">{longitude}</span>
+                        {longitude && (
+                          <span id="location-latitude">{longitude}</span>
+                        )}
+                        {!longitude && currLocation && (
+                          <span id="location-latitude">
+                            {currLocation.split(" , ")[1]}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -275,6 +378,25 @@ export const CreateRecordPage = ({
                     className="dashboard-form-item-preview"
                     id="image-preview-div"
                   >
+                    {images && (
+                      <Fragment>
+                        {images.length > 0 && (
+                          <Fragment>
+                            {images.map(img => (
+                              <div
+                                key={img}
+                                className="dashboard-form-item-preview img"
+                              >
+                                <img
+                                  src={`${baseURL}/img/${img}`}
+                                  alt="Sans-Stitches Record"
+                                />
+                              </div>
+                            ))}
+                          </Fragment>
+                        )}
+                      </Fragment>
+                    )}
                     {imagesSrc.map((img, i) => (
                       <div
                         key={img}
@@ -325,17 +447,29 @@ export const CreateRecordPage = ({
                     inputName="video"
                     inputId="video"
                     onChange={handleChange}
+                    value={videos ? videos[0] : ""}
+                    customClass="cant-update"
+                    isDisabled
                   />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                className="rect-red-button"
-                disabled={loading}
-              >
-                Create
-              </button>
+              <div className="edit-record-button-div">
+                <button
+                  className="rect-red-button edit-record-update-button"
+                  type="submit"
+                  id="edit-record-update-btn"
+                  disabled={!recordEditted || loading}
+                >
+                  Update
+                </button>
+              </div>
+              {!recordEditted && (
+                <p className="red-cl edit-record-info">
+                  *Button will be enabled when once you change a field that can
+                  be updated
+                </p>
+              )}
             </form>
           </section>
         </section>
@@ -345,30 +479,54 @@ export const CreateRecordPage = ({
 };
 
 export const mapStateToProps = ({ auth, records, user }) => {
-  const { loading, errorMessages, createdRecordMessage } = records;
+  const {
+    loading,
+    errorMessages,
+    editRecordMessage,
+    recordFetchedForEdit
+  } = records;
   const { token } = auth;
   return {
     token,
     loading,
     errorMessages,
     isAdmin: user.user.is_admin,
-    createdRecordMessage
+    userId: user.user.id,
+    editRecordMessage,
+    recordFetchedForEdit
   };
 };
 
 export const mapDispatchToProps = dispatch => {
   return {
-    createRecord: (token, details) => dispatch(createNewRecord(token, details)),
+    editRecord: (token, details) => dispatch(editRecordAction(token, details)),
     clearErrors: () => dispatch(clearRecordErrors()),
-    resetMessage: () => dispatch(resetCreateRecordMessage())
+    resetMessage: () => dispatch(resetEditRecordMessage()),
+    fetchRecord: recordInfo => dispatch(fetchRecordAction(recordInfo, true))
   };
 };
 
-CreateRecordPage.propTypes = {
+EditRecordPage.propTypes = {
   /**
-   * Function to create record
+   * Match Object
    */
-  createRecord: func.isRequired,
+  match: objectOf(object).isRequired,
+  /**
+   * Record to be edited
+   */
+  recordFetchedForEdit: objectOf(string),
+  /**
+   * User's Id
+   */
+  userId: number,
+  /**
+   * Function to fetch record
+   */
+  fetchRecord: func.isRequired,
+  /**
+   * Function to edit record
+   */
+  editRecord: func.isRequired,
   /**
    * Function to clear errors
    */
@@ -394,22 +552,24 @@ CreateRecordPage.propTypes = {
    */
   resetMessage: func.isRequired,
   /**
-   * Message returned when creating record
+   * Message returned when editing record
    */
-  createdRecordMessage: string,
+  editRecordMessage: string,
   /**
-   * Message returned when creating record
+   * History object
    */
-  history: string.isRequired
+  history: objectOf(string).isRequired
 };
 
-CreateRecordPage.defaultProps = {
+EditRecordPage.defaultProps = {
   errorMessages: [],
   isAdmin: false,
-  createdRecordMessage: ""
+  editRecordMessage: "",
+  userId: -1,
+  recordFetchedForEdit: {}
 };
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(CreateRecordPage);
+)(EditRecordPage);

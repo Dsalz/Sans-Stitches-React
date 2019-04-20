@@ -8,6 +8,12 @@ a {
   cursor: pointer;
 }
 
+input.cant-update,
+textarea.cant-update {
+  background: rgba(198, 203, 222, 0.45);
+  cursor: not-allowed;
+}
+
 button,
 input,
 textarea {

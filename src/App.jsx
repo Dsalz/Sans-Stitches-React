@@ -18,6 +18,7 @@ import AppProfilePage from "./views/ProfilePage";
 import AppMyRecordsPage from "./views/MyRecordsPage";
 import AppCreateRecordsPage from "./views/CreateRecordPage";
 import AppRecordDetailPage from "./views/RecordDetailsPage";
+import AppEditRecordPage from "./views/EditRecordPage";
 
 const App = () => {
   return (
@@ -33,6 +34,11 @@ const App = () => {
           exact
           path="/record/:recordInfo"
           component={AppRecordDetailPage}
+        />
+        <Route
+          exact
+          path="/edit-record/:recordInfo"
+          component={AppEditRecordPage}
         />
       </Switch>
     </BrowserRouter>

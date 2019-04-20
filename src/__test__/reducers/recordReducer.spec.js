@@ -11,7 +11,11 @@ import {
   ERROR_GETTING_RECORD,
   ERROR_DELETING_RECORD,
   RECORD_DELETED,
-  RESET_DELETED_RECORD
+  RESET_DELETED_RECORD,
+  ERROR_EDITING_RECORD,
+  GOT_RECORD_FOR_EDIT,
+  EDITED_RECORD,
+  RESET_EDITED_RECORD
 } from "../../actionTypes";
 
 describe("record reducer's initial state", () => {
@@ -190,6 +194,62 @@ describe("record reducer", () => {
       }
     ]);
     expect(reducerState.recordDeleted).toEqual(false);
+    expect(reducerState.loading).toEqual(false);
+  });
+  it("should update state with record fetched for edit when GOT_RECORD_FOR_EDIT action is dispatched", () => {
+    const mockRecord = { id: 4 };
+    const reducerState = recordReducer(undefined, {
+      type: GOT_RECORD_FOR_EDIT,
+      payload: mockRecord
+    });
+    expect(reducerState.recordFetchedForEdit).toEqual(mockRecord);
+    expect(reducerState.loading).toEqual(false);
+    expect(reducerState.errorMessages).toEqual([]);
+  });
+  it("should update state with success message EDITED_RECORD action is dispatched", () => {
+    const mockSuccessMessage = "Record well and truly updated";
+    const reducerState = recordReducer(undefined, {
+      type: EDITED_RECORD,
+      payload: mockSuccessMessage
+    });
+    expect(reducerState.editRecordMessage).toEqual(mockSuccessMessage);
+    expect(reducerState.loading).toEqual(false);
+    expect(reducerState.errorMessages).toEqual([]);
+  });
+  it("should reset edit record message when RESET_EDITED_RECORD action is dispatched", () => {
+    const initialReducerState = recordReducer(undefined, {
+      type: EDITED_RECORD,
+      payload: "Record has been updated"
+    });
+    expect(initialReducerState.editRecordMessage).toEqual(
+      "Record has been updated"
+    );
+    const reducerState = recordReducer(initialReducerState, {
+      type: RESET_EDITED_RECORD
+    });
+    expect(reducerState.editRecordMessage).toEqual("");
+  });
+  it("should update error messages in the state when ERROR_EDITING_RECORD action is dispatched and error is provided", () => {
+    const mockPayload = "Forbidden";
+    const reducerState = recordReducer(undefined, {
+      type: ERROR_EDITING_RECORD,
+      payload: mockPayload
+    });
+    expect(reducerState.errorMessages).toEqual([{ error: mockPayload }]);
+    expect(reducerState.editRecordMessage).toEqual("");
+    expect(reducerState.loading).toEqual(false);
+  });
+  it("should update error messages in the state when ERROR_EDITING_RECORD action is dispatched and error is not provided", () => {
+    const reducerState = recordReducer(undefined, {
+      type: ERROR_EDITING_RECORD
+    });
+    expect(reducerState.errorMessages).toEqual([
+      {
+        error:
+          "Error editing record, please check your connection and try again later"
+      }
+    ]);
+    expect(reducerState.editRecordMessage).toEqual("");
     expect(reducerState.loading).toEqual(false);
   });
 });

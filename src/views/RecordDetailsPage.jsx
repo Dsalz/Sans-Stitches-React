@@ -149,7 +149,7 @@ export const RecordDetailsPage = ({
             <button
               className="rect-red-button edit-record-delete-button"
               type="button"
-              id="delete-btn"
+              id="modal-delete-btn"
               onClick={() => handleDeleteRecord()}
             >
               Yes
