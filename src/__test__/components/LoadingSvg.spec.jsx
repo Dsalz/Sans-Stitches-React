@@ -9,4 +9,9 @@ describe("Loading Svg Component", () => {
     expect(loadingSvg.find("div.loading-svg-div").exists()).toBe(true);
     expect(loadingSvg.find("svg").exists()).toBe(true);
   });
+  it("renders the light loading svg when prop is passed", () => {
+    const lightLoadingSvg = shallow(<LoadingSvg light />);
+    expect(lightLoadingSvg.find("div.light").exists()).toBe(true);
+    expect(lightLoadingSvg.find("svg").exists()).toBe(true);
+  });
 });

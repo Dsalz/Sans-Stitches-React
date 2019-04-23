@@ -1,11 +1,12 @@
 import React from "react";
+import { bool } from "prop-types";
 
 /**
  * @description svg to depict loading state component
  * @returns {HTMLSvgElement} svg
  */
-const LoadingSvg = () => (
-  <div className="loading-svg-div" id="loading-svg-div">
+const LoadingSvg = ({ light }) => (
+  <div className={`loading-svg-div ${light && "light"}`} id="loading-svg-div">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 100 100"
@@ -20,7 +21,6 @@ const LoadingSvg = () => (
         ng-attr-stroke-width="{{config.width}}"
         ng-attr-r="{{config.radius}}"
         ng-attr-stroke-dasharray="{{config.dasharray}}"
-        stroke="#d81e5b"
         strokeWidth="10"
         r="35"
         strokeDasharray="164.93361431346415 56.97787143782138"
@@ -40,5 +40,13 @@ const LoadingSvg = () => (
     </svg>
   </div>
 );
+
+LoadingSvg.propTypes = {
+  light: bool
+};
+
+LoadingSvg.defaultProps = {
+  light: false
+};
 
 export default LoadingSvg;

@@ -132,7 +132,7 @@ export const SignUpPage = ({
     <Redirect to="/profile" />
   ) : (
     <div className="blk-rd-gradient" id="signUpDiv">
-      {loading && <LoadingSvg />}
+      {loading && <LoadingSvg light />}
       <IndexNavbar />
       <main className="index-main">
         <section className="index-form-section">
