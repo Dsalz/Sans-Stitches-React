@@ -98,14 +98,13 @@ export const createNewRecord = (token, details) => {
         });
       }
       const { message, id } = data[0];
-      let patchResponse = { data: {} };
       if (images.length) {
         const imgFormData = new FormData();
         images.forEach((file, index) =>
           imgFormData.append(`files[${index}]`, file)
         );
         imgFormData.append("enctype", "multipart/form-data");
-        patchResponse = await axios.patch(
+        const patchResponse = await axios.patch(
           `/${typeEndpoint}/${id}/addImages`,
           imgFormData,
           {
@@ -114,14 +113,14 @@ export const createNewRecord = (token, details) => {
             }
           }
         );
-      }
-      if (patchResponse.data.error) {
-        return dispatch({
-          type: ERROR_CREATING_RECORD,
-          payload: `Record created but could not attach images to it because ${
-            patchResponse.data.error
-          }`
-        });
+        if (patchResponse.data.error) {
+          return dispatch({
+            type: ERROR_CREATING_RECORD,
+            payload: `Record created but could not attach images to it because ${
+              patchResponse.data.error
+            }`
+          });
+        }
       }
 
       return dispatch({
