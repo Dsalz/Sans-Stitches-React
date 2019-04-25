@@ -98,7 +98,7 @@ export const createNewRecord = (token, details) => {
         });
       }
       const { message, id } = data[0];
-      let patchResponse = {};
+      let patchResponse = { data: {} };
       if (images.length) {
         const imgFormData = new FormData();
         images.forEach((file, index) =>
